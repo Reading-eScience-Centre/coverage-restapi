@@ -169,8 +169,7 @@ stored inside the coverage format itself.
 Whether to include the full coverage data in a collection resource or just
 provide links to it must be decided case-by-case.
 It is advisable that the data volume is kept to an amount that web clients
-can still handle easily, which typically means in the range of a few megabytes
-at most.
+can still handle easily, which typically means up to a few megabytes at most.
 
 ## 5. Paged collection resources
 
@@ -182,7 +181,7 @@ Example serving a paged CoverageJSON collection:
 ```
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
-HTTP/1.1 301 Moved Temporarily
+HTTP/1.1 303 See Other
 Location: http://example.com/coveragecollection?page=1
 Content-length: 0
 ```
@@ -223,7 +222,7 @@ $ curl http://example.com/coveragecollection?page=2 -H "Accept: application/prs.
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
 Link: <http://example.com/coveragecollection?page=1>; rel="first"
-Link: <http://example.com/coveragecollection?page=1>; rel="previous"
+Link: <http://example.com/coveragecollection?page=1>; rel="prev"
 Link: <http://example.com/coveragecollection?page=3>; rel="next"
 Link: <http://example.com/coveragecollection?page=221>; rel="last"
 
