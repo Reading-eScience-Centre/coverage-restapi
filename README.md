@@ -10,4 +10,4 @@ This API specification is meant for the web and embraces its principles.
 It is an alternative to existing/historically grown APIs like [WCS](https://en.wikipedia.org/wiki/Web_Coverage_Service). 
 
 [The specification](spec.md) is currently in active development.
-Please use the [issue tracker](issues) for sending in feedback.
+Please use the [issue tracker](https://github.com/neothemachine/coverage-restapi/issues) for sending in feedback.
