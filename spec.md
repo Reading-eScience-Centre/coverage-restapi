@@ -10,8 +10,8 @@ determined by the amount of data to be served, the type of users, and their acce
 
 It is important to realize that there is no requirement to implement one or the other
 aspect detailed below. This is made possible by self-describing and therefore
-advertising the offered capabilities that the server offers in each and every resource,
-without relying on a fixed structure like an API root metadata document.
+advertising the offered capabilities that the server offers to the client in each and every resource
+as metadata, without relying on a fixed structure like an API root document.
 
 A specific API that is implemented in a server and follows aspects of this specification
 may be loosely named "Coverage Data REST API", however, since such API is merely
@@ -69,7 +69,7 @@ in the linked web).
 
 Example:
 ```
-$ curl -H "Accept: application/x-netcdf" http://example.com/coveragedata
+$ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
 
 HTTP/1.1 200 OK
 Content-Type: application/x-netcdf
@@ -77,7 +77,7 @@ Content-Type: application/x-netcdf
 [binary netcdf]
 ```
 ```
-$ curl -H "Accept: image/tiff" http://example.com/coveragedata
+$ curl http://example.com/coveragedata -H "Accept: image/tiff"
 
 HTTP/1.1 200 OK
 Content-Type: image/tiff
@@ -120,43 +120,51 @@ offers the collection with full coverage data embedded (more on that in later se
 
 Example serving a CoverageJSON collection as separate resources:
 ```
-$ curl http://example.com/coveragecollection.covjson
+$ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
 
 {
+  "@context": "http://coveragejson.org",
+  "id": "http://example.com/coveragecollection",
   "type": "CoverageCollection",
   "parameters": {...},
   "coverages": [{
+    "id": "http://example.com/coveragecollection/coverage1",
     "type": "GridCoverage",
-  	"id": "http://example.com/coverage1.covjson",
     "title": "First coverage",
-    "domain": "http://example.com/coverage1_domain.covjson",
-    "ranges": {"TEMP": "http://example.com/coverage1_TEMP.covjson"} 
+    "domain": "http://example.com/coverage1_domain",
+    "ranges": {"TEMP": "http://example.com/coveragecollection/coverage1/TEMP"} 
   }, {
     "type": "GridCoverage",
-  	"id": "http://example.com/coverage2.covjson",
+  	"id": "http://example.com/coveragecollection/coverage2",
     "title": "Second coverage",
-    "domain": "http://example.com/coverage2_domain.covjson",
-    "ranges": {"SPEED": "http://example.com/coverage2_SPEED.covjson"}
+    "domain": "http://example.com/coveragecollection/coverage2/domain",
+    "ranges": {"SPEED": "http://example.com/coveragecollection/coverage2/SPEED"}
   }]
 }
 ```
 ```
-$ curl http://example.com/coverage1.covjson
+$ curl http://example.com/coveragecollection/coverage1 -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection>; rel="collection"
 
 {
+  "@context": "http://coveragejson.org",
   "type": "GridCoverage",
-  "id": "http://example.com/coverage1.covjson",
+  "id": "http://example.com/coveragecollection/coverage1",
   "title": "First coverage",
   "domain": {...},
-  "ranges": {"TEMP": {...}} 
+  "ranges": {"TEMP": {...}}
 }
 ```
+
+It is recommended to include the above `Link` header in coverage resources of
+the collection to provide context and a way of navigation independent of what might be
+stored inside the coverage format itself.
 
 Whether to include the full coverage data in a collection resource or just
 provide links to it must be decided case-by-case.
@@ -166,6 +174,77 @@ at most.
 
 ## 5. Paged collection resources
 
-Offering paged collection resources is one of several optional capabilities that can be added to the API.
+Coverage data can become big quite quickly.
+Therefore, different strategies are needed for clients to handle such data in a
+convenient way. One such strategy is to offer paged collection resources.
+
+Example serving a paged CoverageJSON collection:
+```
+$ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 301 Moved Temporarily
+Location: http://example.com/coveragecollection?page=1
+Content-length: 0
+```
+```
+$ curl http://example.com/coveragecollection?page=1 -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection?page=1>; rel="first"
+Link: <http://example.com/coveragecollection?page=2>; rel="next"
+Link: <http://example.com/coveragecollection?page=221>; rel="last"
+
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org"
+  ],
+  "id": "http://example.com/coveragecollection",
+  "type": "CoverageCollection",
+  "coverages": [...],
+  "view" : {
+    "id" : "#pagination",
+    "@graph" : {
+      "id" : "http://example.com/coveragecollection?page=1",
+      "type" : "PartialCollectionView",
+      "totalItems" : 22021,
+      "itemsPerPage" : 100,
+      "first" : "http://example.com/coveragecollection?page=1",
+      "next" : "http://example.com/coveragecollection?page=2",
+      "last" : "http://example.com/coveragecollection?page=221"
+    }
+  }
+}
+```
+```
+$ curl http://example.com/coveragecollection?page=2 -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection?page=1>; rel="first"
+Link: <http://example.com/coveragecollection?page=1>; rel="previous"
+Link: <http://example.com/coveragecollection?page=3>; rel="next"
+Link: <http://example.com/coveragecollection?page=221>; rel="last"
+
+{...}
+```
+
+There are several things to consider here:
+- If there would be just a single page, then none of the above would happen.
+  There would be no redirect to page one and there would be no navigational metadata.
+  Paging only comes into effect when there is more than one page.
+- Navigational metadata has to be included in the response of each page.
+  If the format itself allows to include those (as above inside the `"view"` property)
+  in an interoperable way then this should be done.
+  In addition, matching Link headers may be included as well.
+  However, if the format does not allow to include navigational metadata, then
+  the Link headers are required.
+- If JSON-LD is used as a format, then the navigational metadata should be included
+  as above using the Hydra ontology in a non-default graph. The default graph should
+  not be used to logically separate the actual data from the control metadata.
+- If the format supports resource identifiers (as above), then the collection elements
+  have to be associated to the collection resource and *not* the page resource.
+  Only the navigational metadata may be associated with the page resource.
 
 
