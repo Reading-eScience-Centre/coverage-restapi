@@ -190,6 +190,7 @@ $ curl http://example.com/coveragecollection?page=1 -H "Accept: application/prs.
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection>; rel="canonical"
 Link: <http://example.com/coveragecollection?page=1>; rel="first"
 Link: <http://example.com/coveragecollection?page=2>; rel="next"
 Link: <http://example.com/coveragecollection?page=221>; rel="last"
@@ -221,6 +222,7 @@ $ curl http://example.com/coveragecollection?page=2 -H "Accept: application/prs.
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection>; rel="canonical"
 Link: <http://example.com/coveragecollection?page=1>; rel="first"
 Link: <http://example.com/coveragecollection?page=1>; rel="prev"
 Link: <http://example.com/coveragecollection?page=3>; rel="next"
@@ -239,11 +241,15 @@ There are several things to consider here:
   In addition, matching Link headers may be included as well.
   However, if the format does not allow to include navigational metadata, then
   the Link headers are required.
+- A server is not required to support all navigation patterns. This means that
+  "first" and "last" are optional. A server can also just support forward traversal.
 - If JSON-LD is used as a format, then the navigational metadata should be included
   as above using the Hydra ontology in a non-default graph. The default graph should
   not be used to logically separate the actual data from the control metadata.
 - If the format supports resource identifiers (as above), then the collection elements
   have to be associated to the collection resource and *not* the page resource.
   Only the navigational metadata may be associated with the page resource.
-
+  If the format does not support resource identifiers, then a Link header with "canonical"
+  is required that links back to the collection resource, otherwise it is optional but
+  recommended.
 
