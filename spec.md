@@ -39,7 +39,7 @@ In its simplest form, Coverage Data is made available as one or more resources,
 served with the correct media type. The resources can be static files.
 
 Example serving a netCDF file:
-```
+```sh
 $ curl http://example.com/coveragedata.nc
 
 HTTP/1.1 200 OK
@@ -49,7 +49,7 @@ Content-Type: application/x-netcdf
 ```
 
 Example serving a GeoTIFF file:
-```
+```sh
 $ curl http://example.com/coveragedata.geotiff
 
 HTTP/1.1 200 OK
@@ -68,7 +68,7 @@ Coverage Data as a concept stays at a single URL (which is important
 in the linked web).
 
 Example:
-```
+```sh
 $ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
 
 HTTP/1.1 200 OK
@@ -76,7 +76,7 @@ Content-Type: application/x-netcdf
 
 [binary netcdf]
 ```
-```
+```sh
 $ curl http://example.com/coveragedata -H "Accept: image/tiff"
 
 HTTP/1.1 200 OK
@@ -119,7 +119,7 @@ Note that this does not mean that there can't be a resource which
 offers the collection with full coverage data embedded (more on that in later sections).
 
 Example serving a CoverageJSON collection as separate resources:
-```
+```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
@@ -145,7 +145,7 @@ Content-Type: application/prs.coverage+json
   }]
 }
 ```
-```
+```sh
 $ curl http://example.com/coveragecollection/coverage1 -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
@@ -178,14 +178,14 @@ Therefore, different strategies are needed for clients to handle such data in a
 convenient way. One such strategy is to offer paged collection resources.
 
 Example serving a paged CoverageJSON collection:
-```
+```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 303 See Other
 Location: http://example.com/coveragecollection?page=1
 Content-length: 0
 ```
-```
+```sh
 $ curl http://example.com/coveragecollection?page=1 -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
@@ -217,7 +217,7 @@ Link: <http://example.com/coveragecollection?page=221>; rel="last"
   }
 }
 ```
-```
+```sh
 $ curl http://example.com/coveragecollection?page=2 -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
