@@ -253,3 +253,48 @@ There are several things to consider here:
   is required that links back to the collection resource, otherwise it is optional but
   recommended.
 
+## 6. Embedded resources
+
+In coverage data resources, certain data may not be included by default and instead
+be linked. For example, a collection resource may not include the actual domain and range
+data of the coverages, but instead just metadata and appropriate URLs to fetch the data.
+This is similar to a shopping website, where product overviews are given in search results
+that then contain links to the full descriptions.
+
+In some cases, it is useful to include the full data within a given resource to prevent
+additional server requests and the transfer of partially duplicate data.
+A typical example is to request data of a big number of coverages that
+by themselves are fairly small in data volume. Instead of fetching a small collection resource
+followed by fetching hundreds of small coverage resources, one could fetch a single bigger collection
+resource that includes all necessary data.
+
+A server may offer support for such client preferences but it does not have to.
+The recommended way to offer such functionality is described below.
+
+
+https://tools.ietf.org/html/rfc7240
+http://www.w3.org/TR/ldp/#prefer-parameters
+
+```sh
+$ curl http://example.com/coveragecollection
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://coveragejson.org/def#Domain>; rel="http://coverageapi.org/ns#CanInclude"
+Link: <http://coveragejson.org/def#Range>; rel="http://coverageapi.org/ns#CanInclude"
+
+{... domain and range are not embedded by default ...}
+```
+```sh
+$ curl http://example.com/coveragecollection -H "Prefer: include=\"http://coveragejson.org/def#Domain http://coveragejson.org/def#Range\"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://coveragejson.org/def#Domain>; rel="http://coverageapi.org/ns#CanInclude"
+Link: <http://coveragejson.org/def#Range>; rel="http://coverageapi.org/ns#CanInclude"
+
+{... domain and range are embedded now ...}
+```
+
+TODO how does this work within hydra?
+TODO do we want query parameters as well?
