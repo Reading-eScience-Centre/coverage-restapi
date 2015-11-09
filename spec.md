@@ -137,8 +137,8 @@ Content-Type: application/prs.coverage+json
     "domain": "http://example.com/coverage1_domain",
     "ranges": {"TEMP": "http://example.com/coveragecollection/coverage1/TEMP"} 
   }, {
+    "id": "http://example.com/coveragecollection/coverage2",
     "type": "GridCoverage",
-  	"id": "http://example.com/coveragecollection/coverage2",
     "title": "Second coverage",
     "domain": "http://example.com/coveragecollection/coverage2/domain",
     "ranges": {"SPEED": "http://example.com/coveragecollection/coverage2/SPEED"}
@@ -271,10 +271,7 @@ resource that includes all necessary data.
 A server may offer support for such client preferences but it does not have to.
 The recommended way to offer such functionality is described below.
 
-
-https://tools.ietf.org/html/rfc7240
-http://www.w3.org/TR/ldp/#prefer-parameters
-
+Example:
 ```sh
 $ curl http://example.com/coveragecollection
 
@@ -282,19 +279,81 @@ HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
 Link: <http://coveragejson.org/def#Domain>; rel="http://coverageapi.org/ns#CanInclude"
 Link: <http://coveragejson.org/def#Range>; rel="http://coverageapi.org/ns#CanInclude"
+Vary: Prefer
 
 {... domain and range are not embedded by default ...}
 ```
 ```sh
-$ curl http://example.com/coveragecollection -H "Prefer: include=\"http://coveragejson.org/def#Domain http://coveragejson.org/def#Range\"
+$ curl http://example.com/coveragecollection -H "Prefer: include=\"http://coveragejson.org/def#Domain http://coveragejson.org/def#Range\"" \
+                                             -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
 Link: <http://coveragejson.org/def#Domain>; rel="http://coverageapi.org/ns#CanInclude"
 Link: <http://coveragejson.org/def#Range>; rel="http://coverageapi.org/ns#CanInclude"
+Vary: Prefer
 
 {... domain and range are embedded now ...}
 ```
+This is based on [RFC7240](https://tools.ietf.org/html/rfc7240) and
+the [include](http://www.w3.org/TR/ldp/#prefer-parameters) parameter defined within [LDP](http://www.w3.org/TR/ldp/).
+A standard way to advertise available preferences to the client does not exist yet.
+In the example above, a custom predicate `http://coverageapi.org/ns#CanInclude` in a Link header is used for that purpose.
 
-TODO how does this work within hydra?
-TODO do we want query parameters as well?
+Note that the above method requires a server implementation of 
+[CORS "preflight"](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing#Preflight_example) requests
+which browsers will send when using the `Prefer` header for cross-domain requests.
+
+If the above method using the `Prefer` header is not suitable for a specific API implementation,
+then an alternative based on URL query parameters may be used.
+
+Example:
+```sh
+$ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    "api": "http://coverageapi.org/ns#api"
+  ],
+  "id": "http://example.com/coveragecollection",
+  "type": "CoverageCollection",
+  "coverages": [...],
+  "api": {
+    "id" : "#api",
+    "@graph" : {
+      "type": "IriTemplate",
+      "template": "http://example.com/coveragecollection{?include}",
+      "mappings": [{
+        "type": "IriTemplateMapping",
+        "variable": "include",
+        "property": {
+          "id": "http://coverageapi.org/ns#include",
+          "comment": "A comma separated string of one or both: domain, range. Determines what is included in the resource.",
+          "range": "xsd:string"
+        },
+        "required": false
+      }]
+    }
+  }
+}
+```
+```sh
+$ curl http://example.com/coveragecollection?include=domain,range -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection>; rel="canonical"
+
+{...}
+```
+
+Metadata on how to build the URL for embedding data has to be included in each resource
+that supports it, as above inside the `"api"` property.
+If JSON-LD is used as a format, then that metadata should be included
+as above using the Hydra ontology in a non-default graph. The default graph should
+not be used to logically separate the actual data from the control metadata.
