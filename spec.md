@@ -318,7 +318,12 @@ Content-Type: application/prs.coverage+json
   "@context": [
     "http://www.w3.org/ns/hydra/core",
     "http://coveragejson.org",
-    "api": "http://coverageapi.org/ns#api"
+    {
+      "api": "http://coverageapi.org/ns#api",
+      "owl": "http://www.w3.org/2002/07/owl#",
+      "DataRange": "owl:DataRange",
+      "oneOf": {"@id": "owl:oneOf", "@container": "@list"}
+    }
   ],
   "id": "http://example.com/coveragecollection",
   "type": "CoverageCollection",
@@ -334,7 +339,10 @@ Content-Type: application/prs.coverage+json
         "property": {
           "id": "http://coverageapi.org/ns#include",
           "comment": "A comma separated string of one or both: domain, range. Determines what is included in the resource.",
-          "range": "xsd:string"
+          "range": {
+            "type": "DataRange",
+            "oneOf": ["domain", "range", "domain,range"]
+          }
         },
         "required": false
       }]
