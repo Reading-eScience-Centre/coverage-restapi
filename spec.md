@@ -305,10 +305,13 @@ Vary: Prefer
 
 {... domain and range are embedded now ...}
 ```
-This is based on [RFC7240](https://tools.ietf.org/html/rfc7240) and
-the [include](http://www.w3.org/TR/ldp/#prefer-parameters) parameter defined within [LDP](http://www.w3.org/TR/ldp/).
+This is based on the `Prefer` header defined in [RFC7240](https://tools.ietf.org/html/rfc7240) and
+the [`include`](http://www.w3.org/TR/ldp/#prefer-parameters) parameter defined within [LDP](http://www.w3.org/TR/ldp/).
 A standard way to advertise available preferences to the client does not exist yet.
 In the example above, a custom predicate `http://coverageapi.org/ns#CanInclude` in a Link header is used for that purpose.
+The `Prefer` header is not more than a preference. A server may not respect that preference and the client is expected
+to handle the situation regardless. The client can inspect whether the server fulfilled the preference by looking
+at the returned coverage data.
 
 Note that the above method requires a server implementation of 
 [CORS "preflight"](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing#Preflight_example) requests
