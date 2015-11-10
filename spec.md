@@ -310,7 +310,8 @@ the [`include`](http://www.w3.org/TR/ldp/#prefer-parameters) parameter defined w
 A standard way to advertise available preferences to the client does not exist yet.
 In the example above, a custom predicate `http://coverageapi.org/ns#CanInclude` in a Link header is used for that purpose.
 The `Prefer` header is not more than a preference. A server may not respect that preference and the client is expected
-to handle the situation regardless. The client can inspect whether the server fulfilled the preference by looking
+to handle the situation regardless. However, if the server sends Link headers as above, then it should also support those
+preferences. The client can inspect whether the server fulfilled the preference by looking
 at the returned coverage data.
 
 Note that the above method requires a server implementation of 
@@ -373,8 +374,10 @@ Link: <http://example.com/coveragecollection>; rel="canonical"
 {...}
 ```
 
+If the server decides to 
+
 Metadata on how to build the URL for embedding data has to be included in each resource
-that supports it, as above inside the `"api"` property.
+that supports it, for example as above inside the `"api"` property.
 If JSON-LD is used as a format, then that metadata should be included
 as above using the Hydra ontology in a non-default graph. The default graph should
 not be used to logically separate the actual data from the control metadata.
@@ -635,3 +638,12 @@ but instead any further subsetting has to begin at the original coverage.
 
 In the example above, subsetting is done on a single coverage. The same technique can also be
 applied to coverage collections, as hinted in the `"inCollection"` field of the subsetted coverage.
+
+## 8. Index-based subsetted resources
+
+Subsetting coverage data by defining coordinate bounds (previous section) is not always desirable.
+When a domain axis shall be fixed to a single coordinate (e.g. a given time or height step),
+then it may be easier to operate in the index space of the coverage domain.
+This is typically only possible if the corresponding coverage domain is already known.
+
+TODO how generic should this be defined?
