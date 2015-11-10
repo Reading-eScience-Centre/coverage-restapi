@@ -153,18 +153,26 @@ Content-Type: application/prs.coverage+json
 Link: <http://example.com/coveragecollection>; rel="collection"
 
 {
-  "@context": "http://coveragejson.org",
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    { "inCollection": { "@reverse": "member" } }
+  ],
   "type": "GridCoverage",
   "id": "http://example.com/coveragecollection/coverage1",
   "title": "First coverage",
   "domain": {...},
-  "ranges": {"TEMP": {...}}
+  "ranges": {"TEMP": {...}},
+  "inCollection": {
+    "id": "http://example.com/coveragecollection",
+    "type": "CoverageCollection"
+  }
 }
 ```
 
 It is recommended to include the above `Link` header in coverage resources of
 the collection to provide context and a way of navigation independent of what might be
-stored inside the coverage format itself.
+stored inside the coverage format itself (see `"inCollection"`).
 
 Whether to include the full coverage data in a collection resource or just
 provide links to it must be decided case-by-case.
@@ -203,13 +211,13 @@ Link: <http://example.com/coveragecollection?page=221>; rel="last"
   "id": "http://example.com/coveragecollection",
   "type": "CoverageCollection",
   "coverages": [...],
+  "totalItems": 22021,
   "view" : {
     "id" : "#pagination",
     "@graph" : {
       "id" : "http://example.com/coveragecollection?page=1",
       "type" : "PartialCollectionView",
-      "totalItems" : 22021,
-      "itemsPerPage" : 100,
+      "itemsPerPage": 100,
       "first" : "http://example.com/coveragecollection?page=1",
       "next" : "http://example.com/coveragecollection?page=2",
       "last" : "http://example.com/coveragecollection?page=221"
@@ -506,6 +514,7 @@ $ curl http://example.com/coveragecollection/coverage1 -H "Accept: application/p
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection>; rel="collection"
 
 {
   "@context": [
@@ -515,14 +524,19 @@ Content-Type: application/prs.coverage+json
       "covapi": "http://coverageapi.org/ns#",
       "api": "covapi:api",
       "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
-      "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
+      "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/",
+      "inCollection": { "@reverse": "member" }
     }
   ],
   "id": "http://example.com/coveragecollection/coverage1",
   "type": "GridCoverage",
   "title": "First coverage",
   "domain": {...},
-  "ranges": {...}
+  "ranges": {...},
+  "inCollection": {
+    "id": "http://example.com/coveragecollection",
+    "type": "CoverageCollection"
+  },
   "api": {
     "id" : "#api",
     "@graph" : {
@@ -566,7 +580,7 @@ $ curl http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://example.com/coveragecollection/coverage1>; rel="canonical"
+Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z&subsetTimeEnd=>; rel="collection"
 
 {
   "@context": [
@@ -576,6 +590,7 @@ Link: <http://example.com/coveragecollection/coverage1>; rel="canonical"
       "covapi": "http://coverageapi.org/ns#",
       "api": "covapi:api",
       "subsetOf": "covapi:subsetOf",
+      "inCollection": { "@reverse": "member" },
       "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
       "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
     }
@@ -585,8 +600,17 @@ Link: <http://example.com/coveragecollection/coverage1>; rel="canonical"
   "title": "First coverage",
   "domain": {... subsetted ...},
   "ranges": {... subsetted ...},
+  "inCollection": {
+    "id": "http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z&subsetTimeEnd=",
+    "type": "CoverageCollection",
+    "subsetOf": {
+      "id": "http://example.com/coveragecollection",
+      "type": "CoverageCollection"
+    }
+  },
   "subsetOf": {
   	"id": "http://example.com/coveragecollection/coverage1",
+  	"type": "GridCoverage",
     "api": {
       "id" : "#api",
       "@graph" : {
@@ -605,6 +629,4 @@ By doing that, the server states that the subsetted resource cannot be directly 
 but instead any further subsetting has to begin at the original coverage.
 
 In the example above, subsetting is done on a single coverage. The same technique can also be
-applied to coverage collections.
-
-
+applied to coverage collections, as hinted in the `"inCollection"` field of the subsetted coverage.
