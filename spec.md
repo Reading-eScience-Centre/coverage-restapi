@@ -380,7 +380,7 @@ If the server decides to reject the request for embedding data, then it must red
 to a resource that the server can fulfill, typically the default one without any parameters:
 
 ```sh
-$ curl http://example.com/coveragecollection?include=domain,range -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection?include=domain&include=range -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 303 See Other
 Location: http://example.com/coveragecollection
