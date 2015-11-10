@@ -443,4 +443,60 @@ Link: <http://example.com/coveragecollection>; rel="canonical"
 The exact semantics of the parameters together with additional parameters are defined in
 [OpenSearch Geo & Time](http://www.opengis.net/doc/IS/opensearchgeo/1.0).
 
+Note that if more filtering options are required than are defined within OpenSearch Geo & Time
+(for example, depth/vertical filtering), then a new template variable from another such standard
+may be used, or a new custom created if none exists, under a different URI namespace.
+
+Example of non-standard filtering parameter:
+```sh
+$ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    {
+      "api": "http://coverageapi.org/ns#api"
+    }
+  ],
+  "id": "http://example.com/coveragecollection",
+  "type": "CoverageCollection",
+  "coverages": [...],
+  "api": {
+    "id" : "#api",
+    "@graph" : {
+      "type": "IriTemplate",
+      "template": "http://example.com/coveragecollection?verticalStart={filterByVerticalStart}&verticalEnd={filterByVerticalEnd}",
+      "mappings": [{
+        "type": "IriTemplateMapping",
+        "variable": "filterByVerticalStart",
+        "property": {
+          "id": "http://some.namespace/ns#verticalStart",
+          "comment": "Numeric string with the start of the vertical interval given in native CRS units.",
+          "range": "xsd:string"
+        },
+        "required": false
+      }, {
+        "type": "IriTemplateMapping",
+        "variable": "filterByVerticalEnd",
+        "property": {
+          "id": "http://some.namespace/ns#verticalEnd",
+          "comment": "Numeric string with the end of the vertical interval given in native CRS units.",
+          "range": "xsd:string"
+        },
+        "required": false
+      }]
+    }
+  }
+}
+```
+In this example, the coordinate reference system for the vertical coordinates would have to be
+defined in the same collection document such that the client knows what the parameters verticalStart
+and verticalEnd really mean.
+
+## 7. Spatiotemporally subsetted resources
+
 
