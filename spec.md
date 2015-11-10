@@ -305,7 +305,7 @@ Note that the above method requires a server implementation of
 which browsers will send when using the `Prefer` header for cross-domain requests.
 
 If the above method using the `Prefer` header is not suitable for a specific API implementation,
-then an alternative based on URL query parameters may be used.
+then an alternative based on URL templates ([RFC6570](https://tools.ietf.org/html/rfc6570)) may be used. 
 
 Example:
 ```sh
@@ -365,3 +365,82 @@ that supports it, as above inside the `"api"` property.
 If JSON-LD is used as a format, then that metadata should be included
 as above using the Hydra ontology in a non-default graph. The default graph should
 not be used to logically separate the actual data from the control metadata.
+
+## 7. Spatiotemporally filtered collection resources
+
+A common use case is to filter big coverage collections by a certain geographical area or
+time period.
+
+
+Example:
+```sh
+$ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    {
+      "api": "http://coverageapi.org/ns#api",
+      "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
+      "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
+    }
+  ],
+  "id": "http://example.com/coveragecollection",
+  "type": "CoverageCollection",
+  "coverages": [...],
+  "api": {
+    "id" : "#api",
+    "@graph" : {
+      "type": "IriTemplate",
+      "template": "http://example.com/coveragecollection?bbox={filterByBbox}&timeStart={filterByStartTime}&timeEnd={filterByEndTime}",
+      "mappings": [{
+        "type": "IriTemplateMapping",
+        "variable": "filterByBbox",
+        "property": {
+          "id": "opensearchgeo:box",
+          "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees.
+                      For values crossing the 180 degrees meridian the west value should be bigger than the east value.",
+          "range": "xsd:string"
+        },
+        "required": false
+      }, {
+        "type": "IriTemplateMapping",
+        "variable": "filterByStartTime",
+        "property": {
+          "id": "opensearchtime:start",
+          "comment": "Character string with the start of the temporal interval according to RFC3339.",
+          "range": "xsd:string"
+        },
+        "required": false
+      }, {
+        "type": "IriTemplateMapping",
+        "variable": "filterByEndTime",
+        "property": {
+          "id": "opensearchtime:end",
+          "comment": "Character string with the end of the temporal interval according to RFC3339.",
+          "range": "xsd:string"
+        },
+        "required": false
+      }]
+    }
+  }
+}
+```
+```sh
+$ curl http://example.com/coveragecollection?bbox=120,10,134,14&timeStart=2012-01-01T00:00:00Z&timeEnd=2012-02-01T00:00:00Z -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection>; rel="canonical"
+
+{... only includes coverages that match the filter criteria ...}
+```
+
+The exact semantics of the parameters together with additional parameters are defined in
+[OpenSearch Geo & Time](http://www.opengis.net/doc/IS/opensearchgeo/1.0).
+
+
