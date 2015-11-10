@@ -90,6 +90,8 @@ knows the media types to include in the "Accept" header.
 This is how web browsers work as well, they know HTML, so they
 specifically request that media type.
 
+Pro tip: Have HTML as format as well so that humans can explore the coverage data more easily.
+
 ### A note on copy-pasting URLs and expectations
 
 A slight inconvenience with this approach is that it doesn't easily allow
