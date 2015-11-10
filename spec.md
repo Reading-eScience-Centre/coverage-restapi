@@ -500,3 +500,111 @@ and verticalEnd really mean.
 ## 7. Spatiotemporally subsetted resources
 
 
+Example of subsetting a single coverage:
+```sh
+$ curl http://example.com/coveragecollection/coverage1 -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    {
+      "covapi": "http://coverageapi.org/ns#",
+      "api": "covapi:api",
+      "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
+      "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
+    }
+  ],
+  "id": "http://example.com/coveragecollection/coverage1",
+  "type": "GridCoverage",
+  "title": "First coverage",
+  "domain": {...},
+  "ranges": {...}
+  "api": {
+    "id" : "#api",
+    "@graph" : {
+      "type": "IriTemplate",
+      "template": "http://example.com/coveragecollection/coverage1?subsetBbox={subsetByBbox}&subsetTimeStart={subsetByStartTime}&subsetTimeEnd={subsetByEndTime}",
+      "mappings": [{
+        "type": "IriTemplateMapping",
+        "variable": "subsetByBbox",
+        "property": {
+          "id": "covapi:subsetByBbox",
+          "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees.
+                      For values crossing the 180 degrees meridian the west value should be bigger than the east value.",
+          "range": "opensearchgeo:box"
+        },
+        "required": false
+      }, {
+        "type": "IriTemplateMapping",
+        "variable": "subsetByStartTime",
+        "property": {
+          "id": "covapi:subsetByStartTime",
+          "comment": "Character string with the start of the temporal interval according to RFC3339.",
+          "range": "opensearchtime:start"
+        },
+        "required": false
+      }, {
+        "type": "IriTemplateMapping",
+        "variable": "subsetByEndTime",
+        "property": {
+          "id": "covapi:subsetByEndTime",
+          "comment": "Character string with the end of the temporal interval according to RFC3339.",
+          "range": "opensearchtime:end"
+        },
+        "required": false
+      }]
+    }
+  }
+}
+```
+```sh
+$ curl http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z&subsetTimeEnd= -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection/coverage1>; rel="canonical"
+
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    {
+      "covapi": "http://coverageapi.org/ns#",
+      "api": "covapi:api",
+      "subsetOf": "covapi:subsetOf",
+      "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
+      "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
+    }
+  ],
+  "id": "http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z&subsetTimeEnd=",
+  "type": "GridCoverage",
+  "title": "First coverage",
+  "domain": {... subsetted ...},
+  "ranges": {... subsetted ...},
+  "subsetOf": {
+  	"id": "http://example.com/coveragecollection/coverage1",
+    "api": {
+      "id" : "#api",
+      "@graph" : {
+        "type": "IriTemplate",
+        "template": "http://example.com/coveragecollection/coverage1?subsetBbox={subsetByBbox}&subsetTimeStart={subsetByStartTime}&subsetTimeEnd={subsetByEndTime}",
+        "mappings": [...]
+      }
+    }
+  }
+}
+```
+
+Note in the last response that the API metadata is *not* defined for the subsetted resource
+but instead for the original coverage.
+By doing that, the server states that the subsetted resource cannot be directly further subsetted,
+but instead any further subsetting has to begin at the original coverage.
+
+In the example above, subsetting is done on a single coverage. The same technique can also be
+applied to coverage collections.
+
+
