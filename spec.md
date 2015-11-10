@@ -336,7 +336,8 @@ Content-Type: application/prs.coverage+json
       "api": "http://coverageapi.org/ns#api",
       "owl": "http://www.w3.org/2002/07/owl#",
       "DataRange": "owl:DataRange",
-      "oneOf": {"@id": "owl:oneOf", "@container": "@list"}
+      "oneOf": {"@id": "owl:oneOf", "@container": "@list"},
+      "multipleValues": "https://schema.org/multipleValues"
     }
   ],
   "id": "http://example.com/coveragecollection",
@@ -346,18 +347,19 @@ Content-Type: application/prs.coverage+json
     "id" : "#api",
     "@graph" : {
       "type": "IriTemplate",
-      "template": "http://example.com/coveragecollection{?include}",
+      "template": "http://example.com/coveragecollection{?include*}",
       "mappings": [{
         "type": "IriTemplateMapping",
         "variable": "include",
         "property": {
-          "id": "http://coverageapi.org/ns#include",
-          "comment": "A comma separated string of one or both: domain, range. Determines what is included in the resource.",
+          "id": "http://coverageapi.org/ns#preferInclude",
+          "comment": "Indicates a preference that certain coverage data should be directly included in the resource. Currently, either 'domain' or 'range'.",
           "range": {
             "type": "DataRange",
-            "oneOf": ["domain", "range", "domain,range"]
+            "oneOf": ["domain", "range"]
           }
         },
+        "multipleValues": true,
         "required": false
       }]
     }
@@ -365,7 +367,7 @@ Content-Type: application/prs.coverage+json
 }
 ```
 ```sh
-$ curl http://example.com/coveragecollection?include=domain,range -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection?include=domain&include=range -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
@@ -390,6 +392,8 @@ that supports it, for example as above inside the `"api"` property.
 If JSON-LD is used as a format, then that metadata should be included
 as above using the Hydra ontology in a non-default graph. The default graph should
 not be used to logically separate the actual data from the control metadata.
+
+NOTE: "multipleValues" is [not standardized in Hydra](https://lists.w3.org/Archives/Public/public-hydra/2015Nov/0082.html) yet.
 
 ## 7. Spatiotemporally filtered collection resources
 
