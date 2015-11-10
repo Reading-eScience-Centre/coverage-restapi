@@ -374,7 +374,16 @@ Link: <http://example.com/coveragecollection>; rel="canonical"
 {...}
 ```
 
-If the server decides to 
+If the server decides to reject the request for embedding data, then it must redirect
+to a resource that the server can fulfill, typically the default one without any parameters:
+
+```sh
+$ curl http://example.com/coveragecollection?include=domain,range -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 303 See Other
+Location: http://example.com/coveragecollection
+Content-length: 0
+```
 
 Metadata on how to build the URL for embedding data has to be included in each resource
 that supports it, for example as above inside the `"api"` property.
