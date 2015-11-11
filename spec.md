@@ -287,28 +287,29 @@ $ curl http://example.com/coveragecollection
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://coveragejson.org/def#Domain>; rel="http://coverageapi.org/ns#CanInclude"
-Link: <http://coveragejson.org/def#Range>; rel="http://coverageapi.org/ns#CanInclude"
+Link: <http://coveragejson.org/def#Domain>; rel="http://coverageapi.org/ns#canInclude"
+Link: <http://coveragejson.org/def#Range>; rel="http://coverageapi.org/ns#canInclude"
 Vary: Prefer
 
 {... domain and range are not embedded by default ...}
 ```
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json" \
-  -H "Prefer: include=\"http://coveragejson.org/def#Domain http://coveragejson.org/def#Range\""
+  -H "Prefer: return=representation; include=\"http://coveragejson.org/def#Domain http://coveragejson.org/def#Range\""
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://coveragejson.org/def#Domain>; rel="http://coverageapi.org/ns#CanInclude"
-Link: <http://coveragejson.org/def#Range>; rel="http://coverageapi.org/ns#CanInclude"
+Link: <http://coveragejson.org/def#Domain>; rel="http://coverageapi.org/ns#canInclude"
+Link: <http://coveragejson.org/def#Range>; rel="http://coverageapi.org/ns#canInclude"
 Vary: Prefer
 
 {... domain and range are embedded now ...}
 ```
 This is based on the `Prefer` header defined in [RFC7240](https://tools.ietf.org/html/rfc7240) and
-the [`include`](http://www.w3.org/TR/ldp/#prefer-parameters) parameter defined within [LDP](http://www.w3.org/TR/ldp/).
+the [`include`](http://www.w3.org/TR/ldp/#prefer-parameters) parameter of the `return` preference
+defined within [LDP](http://www.w3.org/TR/ldp/).
 A standard way to advertise available preferences to the client does not exist yet.
-In the example above, a custom predicate `http://coverageapi.org/ns#CanInclude` in a Link header is used for that purpose.
+In the example above, a custom predicate `http://coverageapi.org/ns#canInclude` in a Link header is used for that purpose.
 The `Prefer` header is not more than a preference. A server may not respect that preference and the client is expected
 to handle the situation regardless. However, if the server sends Link headers as above, then it should also support those
 preferences. The client can inspect whether the server fulfilled the preference by looking
