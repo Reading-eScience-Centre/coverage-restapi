@@ -395,6 +395,10 @@ If JSON-LD is used as a format, then that metadata should be included
 as above using the Hydra ontology in a non-default graph. The default graph should
 not be used to logically separate the actual data from the control metadata.
 
+Note that this specification does *not* force a specific URL template. The important detail
+is only the "property" within the template mapping, which is `http://coverageapi.org/ns#preferInclude`.
+This is the only trigger for clients to know what the parameter means and how to use it. 
+
 NOTE: "multipleValues" is [not standardized in Hydra](https://lists.w3.org/Archives/Public/public-hydra/2015Nov/0082.html) yet.
 
 ## 7. Spatiotemporally filtered collection resources
@@ -528,6 +532,8 @@ In this example, the coordinate reference system for the vertical coordinates wo
 defined in the same collection document such that the client knows what the parameters verticalStart
 and verticalEnd really mean.
 
+Note that equally to the previous section this specification does *not* force a specific URL template.
+
 ## 7. Spatiotemporally subsetted resources
 
 
@@ -654,6 +660,8 @@ but instead any further subsetting has to begin at the original coverage.
 In the example above, subsetting is done on a single coverage. The same technique can also be
 applied to coverage collections, as hinted in the `"inCollection"` field of the subsetted coverage.
 
+Note that equally to the previous section this specification does *not* force a specific URL template.
+
 ## 8. Index-based subsetted resources
 
 Subsetting coverage data by defining coordinate bounds (previous section) is not always desirable.
@@ -760,3 +768,7 @@ collection, contrarily to the previous section when subsetting by coordinates.
 The reason is that a collection can typically not be subsetted as a whole by axis indices,
 since not all coverages of the collection may have exactly the same domain geometry.
 Instead, the relation to the parent collection is established via the parent coverage (see `"subsetOf"`). 
+
+Note that equally to the previous section this specification does *not* force a specific URL template.
+For example, the template could also be `http://example.com/coverage1?subset={subsetIndex*}`
+which corresponds to URLs like `http://example.com/coverage1?subset=x[0:10],y[0]`
