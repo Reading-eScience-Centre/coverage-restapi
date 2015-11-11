@@ -294,8 +294,8 @@ Vary: Prefer
 {... domain and range are not embedded by default ...}
 ```
 ```sh
-$ curl http://example.com/coveragecollection -H "Prefer: include=\"http://coveragejson.org/def#Domain http://coveragejson.org/def#Range\"" \
-                                             -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json" \
+  -H "Prefer: include=\"http://coveragejson.org/def#Domain http://coveragejson.org/def#Range\""
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
@@ -367,7 +367,8 @@ Content-Type: application/prs.coverage+json
 }
 ```
 ```sh
-$ curl http://example.com/coveragecollection?include=domain&include=range -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection?include=domain&include=range \
+  -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
@@ -380,7 +381,8 @@ If the server decides to reject the request for embedding data, then it must red
 to a resource that the server can fulfill, typically the default one without any parameters:
 
 ```sh
-$ curl http://example.com/coveragecollection?include=domain&include=range -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection?include=domain&include=range \
+  -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 303 See Other
 Location: http://example.com/coveragecollection
@@ -431,8 +433,7 @@ Content-Type: application/prs.coverage+json
         "variable": "filterByBbox",
         "property": {
           "id": "opensearchgeo:box",
-          "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees.
-                      For values crossing the 180 degrees meridian the west value should be bigger than the east value.",
+          "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees. For values crossing the 180 degrees meridian the west value should be bigger than the east value.",
           "range": "xsd:string"
         },
         "required": false
@@ -460,7 +461,8 @@ Content-Type: application/prs.coverage+json
 }
 ```
 ```sh
-$ curl http://example.com/coveragecollection?bbox=120,10,134,14&timeStart=2012-01-01T00:00:00Z&timeEnd=2012-02-01T00:00:00Z -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection?bbox=120,10,134,14&timeStart=2012-01-01T00:00:00Z&timeEnd=2012-02-01T00:00:00Z \
+  -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
@@ -568,8 +570,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "variable": "subsetBbox",
         "property": {
           "id": "covapi:subsetByBbox",
-          "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees.
-                      For values crossing the 180 degrees meridian the west value should be bigger than the east value.",
+          "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees. For values crossing the 180 degrees meridian the west value should be bigger than the east value.",
           "range": "opensearchgeo:box"
         },
         "required": false
@@ -597,7 +598,8 @@ Link: <http://example.com/coveragecollection>; rel="collection"
 }
 ```
 ```sh
-$ curl http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z \ 
+  -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
@@ -699,8 +701,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "variable": "subsetIndex",
         "property": {
           "id": "covapi:subsetByIndex",
-          "comment": "numpy-style slicing syntax: 'x[start:stop:step]' or 'x[start:stop]' or 'x[i]' or 'x[i,j]' or 'x[i,j,k]' etc.
-                      where 'x' is the axis alias, 0 <= 'start' < 'stop', 'step' >= 1 (default 1), and 0 <= 'i','j','k'",
+          "comment": "numpy-style slicing syntax: 'x[start:stop:step]' or 'x[start:stop]' or 'x[i]' or 'x[i,j]' or 'x[i,j,k]' etc. where 'x' is the axis alias, 0 <= 'start' < 'stop', 'step' >= 1 (default 1), and 0 <= 'i','j','k'",
           "range": "xsd:string"
         },
         "multipleValues": true,
@@ -711,7 +712,8 @@ Link: <http://example.com/coveragecollection>; rel="collection"
 }
 ```
 ```sh
-$ curl http://example.com/coveragecollection/coverage1?subsetIndex=x[0:10]&subsetIndex=t[10] -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection/coverage1?subsetIndex=x[0:10]&subsetIndex=t[10] \
+  -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
