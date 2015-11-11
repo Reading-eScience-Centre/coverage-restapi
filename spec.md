@@ -715,7 +715,6 @@ $ curl http://example.com/coveragecollection/coverage1?subsetIndex=x[0:10]&subse
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://example.com/coveragecollection?subsetIndex=x[0:10]&subsetIndex=t[10]>; rel="collection"
 
 {
   "@context": [
@@ -735,17 +734,13 @@ Link: <http://example.com/coveragecollection?subsetIndex=x[0:10]&subsetIndex=t[1
   "title": "First coverage",
   "domain": {... subsetted ...},
   "ranges": {... subsetted ...},
-  "inCollection": {
-    "id": "http://example.com/coveragecollection?subsetIndex=x[0:10]&subsetIndex=t[10]",
-    "type": "CoverageCollection",
-    "subsetOf": {
-      "id": "http://example.com/coveragecollection",
-      "type": "CoverageCollection"
-    }
-  },
   "subsetOf": {
   	"id": "http://example.com/coveragecollection/coverage1",
   	"type": "GridCoverage",
+    "inCollection": {
+      "id": "http://example.com/coveragecollection,
+      "type": "CoverageCollection",
+    },
     "api": {
       "id" : "#api",
       "@graph" : {
@@ -757,3 +752,9 @@ Link: <http://example.com/coveragecollection?subsetIndex=x[0:10]&subsetIndex=t[1
   }
 }
 ```
+
+Note that in the above response the subsetted coverage is not directly associated to a subsetted
+collection, contrarily to the previous section when subsetting by coordinates.
+The reason is that a collection can typically not be subsetted as a whole by axis indices,
+since not all coverages of the collection may have exactly the same domain geometry.
+Instead, the relation to the parent collection is established via the parent coverage (see `"subsetOf"`). 
