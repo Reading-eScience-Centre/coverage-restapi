@@ -432,10 +432,10 @@ Content-Type: application/prs.coverage+json
     "id" : "#api",
     "@graph" : {
       "type": "IriTemplate",
-      "template": "http://example.com/coveragecollection?bbox={filterByBbox}&timeStart={filterByStartTime}&timeEnd={filterByEndTime}",
+      "template": "http://example.com/coveragecollection{?bbox,timeStart,timeEnd}",
       "mappings": [{
         "type": "IriTemplateMapping",
-        "variable": "filterByBbox",
+        "variable": "bbox",
         "property": {
           "id": "opensearchgeo:box",
           "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees. For values crossing the 180 degrees meridian the west value should be bigger than the east value.",
@@ -444,7 +444,7 @@ Content-Type: application/prs.coverage+json
         "required": false
       }, {
         "type": "IriTemplateMapping",
-        "variable": "filterByStartTime",
+        "variable": "timeStart",
         "property": {
           "id": "opensearchtime:start",
           "comment": "Character string with the start of the temporal interval according to RFC3339.",
@@ -453,7 +453,7 @@ Content-Type: application/prs.coverage+json
         "required": false
       }, {
         "type": "IriTemplateMapping",
-        "variable": "filterByEndTime",
+        "variable": "timeEnd",
         "property": {
           "id": "opensearchtime:end",
           "comment": "Character string with the end of the temporal interval according to RFC3339.",
@@ -505,10 +505,10 @@ Content-Type: application/prs.coverage+json
     "id" : "#api",
     "@graph" : {
       "type": "IriTemplate",
-      "template": "http://example.com/coveragecollection?verticalStart={filterByVerticalStart}&verticalEnd={filterByVerticalEnd}",
+      "template": "http://example.com/coveragecollection{?verticalStart,verticalEnd}",
       "mappings": [{
         "type": "IriTemplateMapping",
-        "variable": "filterByVerticalStart",
+        "variable": "verticalStart",
         "property": {
           "id": "http://some.namespace/ns#verticalStart",
           "comment": "Numeric string with the start of the vertical interval given in native CRS units.",
@@ -517,7 +517,7 @@ Content-Type: application/prs.coverage+json
         "required": false
       }, {
         "type": "IriTemplateMapping",
-        "variable": "filterByVerticalEnd",
+        "variable": "verticalEnd",
         "property": {
           "id": "http://some.namespace/ns#verticalEnd",
           "comment": "Numeric string with the end of the vertical interval given in native CRS units.",
@@ -571,7 +571,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
     "id" : "#api",
     "@graph" : {
       "type": "IriTemplate",
-      "template": "http://example.com/coveragecollection/coverage1{?subsetBbox,subsetStartTime,subsetEndTime}",
+      "template": "http://example.com/coveragecollection/coverage1{?subsetBbox,subsetTimeStart,subsetTimeEnd}",
       "mappings": [{
         "type": "IriTemplateMapping",
         "variable": "subsetBbox",
@@ -583,7 +583,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "required": false
       }, {
         "type": "IriTemplateMapping",
-        "variable": "subsetStartTime",
+        "variable": "subsetTimeStart",
         "property": {
           "id": "covapi:subsetByStartTime",
           "comment": "Character string with the start of the temporal interval according to RFC3339.",
@@ -592,7 +592,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "required": false
       }, {
         "type": "IriTemplateMapping",
-        "variable": "subsetEndTime",
+        "variable": "subsetTimeEnd",
         "property": {
           "id": "covapi:subsetByEndTime",
           "comment": "Character string with the end of the temporal interval according to RFC3339.",
@@ -645,7 +645,7 @@ Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTime
       "id" : "#api",
       "@graph" : {
         "type": "IriTemplate",
-        "template": "http://example.com/coveragecollection/coverage1{?subsetBbox,subsetStartTime,subsetEndTime}",
+        "template": "http://example.com/coveragecollection/coverage1{?subsetBbox,subsetTimeStart,subsetTimeEnd}",
         "mappings": [...]
       }
     }
