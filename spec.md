@@ -748,7 +748,7 @@ Content-Type: application/prs.coverage+json
   	"id": "http://example.com/coveragecollection/coverage1",
   	"type": "GridCoverage",
     "inCollection": {
-      "id": "http://example.com/coveragecollection,
+      "id": "http://example.com/coveragecollection",
       "type": "CoverageCollection",
     },
     "api": {
