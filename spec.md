@@ -576,7 +576,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "type": "IriTemplateMapping",
         "variable": "subsetBbox",
         "property": {
-          "id": "covapi:subsetByBbox",
+          "id": "covapi:subsetBbox",
           "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees. For values crossing the 180 degrees meridian the west value should be bigger than the east value.",
           "range": "opensearchgeo:box"
         },
@@ -585,7 +585,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "type": "IriTemplateMapping",
         "variable": "subsetTimeStart",
         "property": {
-          "id": "covapi:subsetByStartTime",
+          "id": "covapi:subsetTimeStart",
           "comment": "Character string with the start of the temporal interval according to RFC3339.",
           "range": "opensearchtime:start"
         },
@@ -594,7 +594,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "type": "IriTemplateMapping",
         "variable": "subsetTimeEnd",
         "property": {
-          "id": "covapi:subsetByEndTime",
+          "id": "covapi:subsetTimeEnd",
           "comment": "Character string with the end of the temporal interval according to RFC3339.",
           "range": "opensearchtime:end"
         },
