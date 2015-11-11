@@ -562,10 +562,10 @@ Link: <http://example.com/coveragecollection>; rel="collection"
     "id" : "#api",
     "@graph" : {
       "type": "IriTemplate",
-      "template": "http://example.com/coveragecollection/coverage1?subsetBbox={subsetByBbox}&subsetTimeStart={subsetByStartTime}&subsetTimeEnd={subsetByEndTime}",
+      "template": "http://example.com/coveragecollection/coverage1{?subsetBbox,subsetStartTime,subsetEndTime}",
       "mappings": [{
         "type": "IriTemplateMapping",
-        "variable": "subsetByBbox",
+        "variable": "subsetBbox",
         "property": {
           "id": "covapi:subsetByBbox",
           "comment": "The box is defined by 'west, south, east, north' coordinates of longitude, latitude, in EPSG:4326 decimal degrees.
@@ -575,7 +575,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "required": false
       }, {
         "type": "IriTemplateMapping",
-        "variable": "subsetByStartTime",
+        "variable": "subsetStartTime",
         "property": {
           "id": "covapi:subsetByStartTime",
           "comment": "Character string with the start of the temporal interval according to RFC3339.",
@@ -584,7 +584,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "required": false
       }, {
         "type": "IriTemplateMapping",
-        "variable": "subsetByEndTime",
+        "variable": "subsetEndTime",
         "property": {
           "id": "covapi:subsetByEndTime",
           "comment": "Character string with the end of the temporal interval according to RFC3339.",
@@ -597,11 +597,11 @@ Link: <http://example.com/coveragecollection>; rel="collection"
 }
 ```
 ```sh
-$ curl http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z&subsetTimeEnd= -H "Accept: application/prs.coverage+json"
+$ curl http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z -H "Accept: application/prs.coverage+json"
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z&subsetTimeEnd=>; rel="collection"
+Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z>; rel="collection"
 
 {
   "@context": [
@@ -616,13 +616,13 @@ Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTime
       "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
     }
   ],
-  "id": "http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z&subsetTimeEnd=",
+  "id": "http://example.com/coveragecollection/coverage1?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z",
   "type": "GridCoverage",
   "title": "First coverage",
   "domain": {... subsetted ...},
   "ranges": {... subsetted ...},
   "inCollection": {
-    "id": "http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z&subsetTimeEnd=",
+    "id": "http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTimeStart=2015-01-01T00:00:00Z",
     "type": "CoverageCollection",
     "subsetOf": {
       "id": "http://example.com/coveragecollection",
@@ -636,7 +636,7 @@ Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTime
       "id" : "#api",
       "@graph" : {
         "type": "IriTemplate",
-        "template": "http://example.com/coveragecollection/coverage1?subsetBbox={subsetByBbox}&subsetTimeStart={subsetByStartTime}&subsetTimeEnd={subsetByEndTime}",
+        "template": "http://example.com/coveragecollection/coverage1{?subsetBbox,subsetStartTime,subsetEndTime}",
         "mappings": [...]
       }
     }
@@ -659,4 +659,101 @@ When a domain axis shall be fixed to a single coordinate (e.g. a given time or h
 then it may be easier to operate in the index space of the coverage domain.
 This is typically only possible if the corresponding coverage domain is already known.
 
-TODO how generic should this be defined?
+Example of subsetting a single coverage:
+```sh
+$ curl http://example.com/coveragecollection/coverage1 -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection>; rel="collection"
+
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    {
+      "covapi": "http://coverageapi.org/ns#",
+      "api": "covapi:api",
+      "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
+      "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/",
+      "inCollection": { "@reverse": "member" },
+      "multipleValues": "https://schema.org/multipleValues"
+    }
+  ],
+  "id": "http://example.com/coveragecollection/coverage1",
+  "type": "GridCoverage",
+  "title": "First coverage",
+  "domain": {...},
+  "ranges": {...},
+  "inCollection": {
+    "id": "http://example.com/coveragecollection",
+    "type": "CoverageCollection"
+  },
+  "api": {
+    "id" : "#api",
+    "@graph" : {
+      "type": "IriTemplate",
+      "template": "http://example.com/coveragecollection/coverage1{?subsetIndex*}",
+      "mappings": [{
+        "type": "IriTemplateMapping",
+        "variable": "subsetIndex",
+        "property": {
+          "id": "covapi:subsetByIndex",
+          "comment": "numpy-style slicing syntax: 'x[start:stop:step]' or 'x[start:stop]' or 'x[i]' or 'x[i,j]' or 'x[i,j,k]' etc.
+                      where 'x' is the axis alias, 0 <= 'start' < 'stop', 'step' >= 1 (default 1), and 0 <= 'i','j','k'",
+          "range": "xsd:string"
+        },
+        "multipleValues": true,
+        "required": false
+      }]
+    }
+  }
+}
+```
+```sh
+$ curl http://example.com/coveragecollection/coverage1?subsetIndex=x[0:10]&subsetIndex=t[10] -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 200 OK
+Content-Type: application/prs.coverage+json
+Link: <http://example.com/coveragecollection?subsetIndex=x[0:10]&subsetIndex=t[10]>; rel="collection"
+
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    {
+      "covapi": "http://coverageapi.org/ns#",
+      "api": "covapi:api",
+      "subsetOf": "covapi:subsetOf",
+      "inCollection": { "@reverse": "member" },
+      "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
+      "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
+    }
+  ],
+  "id": "http://example.com/coveragecollection/coverage1?subsetIndex=x[0:10]&subsetIndex=t[10]",
+  "type": "GridCoverage",
+  "title": "First coverage",
+  "domain": {... subsetted ...},
+  "ranges": {... subsetted ...},
+  "inCollection": {
+    "id": "http://example.com/coveragecollection?subsetIndex=x[0:10]&subsetIndex=t[10]",
+    "type": "CoverageCollection",
+    "subsetOf": {
+      "id": "http://example.com/coveragecollection",
+      "type": "CoverageCollection"
+    }
+  },
+  "subsetOf": {
+  	"id": "http://example.com/coveragecollection/coverage1",
+  	"type": "GridCoverage",
+    "api": {
+      "id" : "#api",
+      "@graph" : {
+        "type": "IriTemplate",
+        "template": "http://example.com/coveragecollection/coverage1{?subsetIndex*}",
+        "mappings": [...]
+      }
+    }
+  }
+}
+```
