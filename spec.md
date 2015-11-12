@@ -709,7 +709,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
         "type": "IriTemplateMapping",
         "variable": "subsetIndex",
         "property": {
-          "id": "covapi:subsetByIndex",
+          "id": "covapi:subsetIndex",
           "comment": "numpy-style slicing syntax: 'x[start:stop:step]' or 'x[start:stop]' or 'x[i]' or 'x[i,j]' or 'x[i,j,k]' etc. where 'x' is the axis alias, 0 <= 'start' < 'stop', 'step' >= 1 (default 1), and 0 <= 'i','j','k'",
           "range": "xsd:string"
         },
