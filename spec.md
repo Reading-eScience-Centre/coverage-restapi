@@ -349,7 +349,7 @@ Content-Type: application/prs.coverage+json
     "@graph" : {
       "type": "IriTemplate",
       "template": "http://example.com/coveragecollection{?include*}",
-      "mappings": [{
+      "mapping": [{
         "type": "IriTemplateMapping",
         "variable": "include",
         "property": {
@@ -433,7 +433,7 @@ Content-Type: application/prs.coverage+json
     "@graph" : {
       "type": "IriTemplate",
       "template": "http://example.com/coveragecollection{?bbox,timeStart,timeEnd}",
-      "mappings": [{
+      "mapping": [{
         "type": "IriTemplateMapping",
         "variable": "bbox",
         "property": {
@@ -506,7 +506,7 @@ Content-Type: application/prs.coverage+json
     "@graph" : {
       "type": "IriTemplate",
       "template": "http://example.com/coveragecollection{?verticalStart,verticalEnd}",
-      "mappings": [{
+      "mapping": [{
         "type": "IriTemplateMapping",
         "variable": "verticalStart",
         "property": {
@@ -572,7 +572,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
     "@graph" : {
       "type": "IriTemplate",
       "template": "http://example.com/coveragecollection/coverage1{?subsetBbox,subsetTimeStart,subsetTimeEnd}",
-      "mappings": [{
+      "mapping": [{
         "type": "IriTemplateMapping",
         "variable": "subsetBbox",
         "property": {
@@ -646,7 +646,7 @@ Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTime
       "@graph" : {
         "type": "IriTemplate",
         "template": "http://example.com/coveragecollection/coverage1{?subsetBbox,subsetTimeStart,subsetTimeEnd}",
-        "mappings": [...]
+        "mapping": [...]
       }
     }
   }
@@ -705,7 +705,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
     "@graph" : {
       "type": "IriTemplate",
       "template": "http://example.com/coveragecollection/coverage1{?subsetIndex*}",
-      "mappings": [{
+      "mapping": [{
         "type": "IriTemplateMapping",
         "variable": "subsetIndex",
         "property": {
@@ -757,7 +757,7 @@ Content-Type: application/prs.coverage+json
       "@graph" : {
         "type": "IriTemplate",
         "template": "http://example.com/coveragecollection/coverage1{?subsetIndex*}",
-        "mappings": [...]
+        "mapping": [...]
       }
     }
   }
