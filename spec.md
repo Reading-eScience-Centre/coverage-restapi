@@ -36,9 +36,11 @@ In example responses, HTTP headers that are not relevant may be omitted.
 ## 2. Static resources
 
 In its simplest form, Coverage Data is made available as one or more resources,
-served with the correct media type. The resources can be static files.
+which may be static files served by a simple server.
 
-Example serving a netCDF file:
+**Requirement:** The correct media type must be returned for the formats that are offered.
+
+#### Example serving a netCDF file
 ```sh
 $ curl http://example.com/coveragedata.nc
 
@@ -48,7 +50,7 @@ Content-Type: application/x-netcdf
 [binary netcdf]
 ```
 
-Example serving a GeoTIFF file:
+#### Example serving a GeoTIFF file
 ```sh
 $ curl http://example.com/coveragedata.geotiff
 
@@ -60,14 +62,14 @@ Content-Type: image/tiff
 
 ## 3. Content negotiation
 
-If the same Coverage Data should be made available in different formats (encodings),
-then it is advisable to use [content negotiation](https://en.wikipedia.org/wiki/Content_negotiation)
-for that purpose.
-This requires more support on the server side but makes sure that the
-Coverage Data as a concept stays at a single URL (which is important
+**Recommendation:* If the same Coverage Data should be made available in different formats,
+then [content negotiation](https://en.wikipedia.org/wiki/Content_negotiation) should be used.
+
+Content negotiation requires more support on the server side but makes sure that the
+Coverage Data as a concept stays at a *single* URL (which is important
 in the linked web).
 
-Example:
+#### Example using content negotiation
 ```sh
 $ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
 
@@ -88,9 +90,9 @@ Content-Type: image/tiff
 The idea is that the client is aware of the formats it supports and therefore
 knows the media types to include in the "Accept" header.
 This is how web browsers work as well, they know HTML, so they
-specifically request that media type.
+specifically request that format.
 
-Pro tip: Have HTML as format as well so that humans can explore the coverage data more easily.
+**Pro Tip:** Offer HTML as format as well so that *humans* can explore the coverage data as well.
 
 ### A note on copy-pasting URLs and expectations
 
@@ -98,7 +100,8 @@ A slight inconvenience with this approach is that it doesn't easily allow
 a human to copy-paste URLs into a browser address bar and "download" the data,
 since he cannot select the format directly.
 A common way out is to also make the different formats available under URLs with file extensions
-(see the "Static resources" section), which then would always deliver the corresponding format.
+(see the "[Static resources](#2-static-resources)" section),
+which then would always deliver the corresponding format and side-step content negotiation.
 
 However, this case gets more complex once the API grows and, for example,
 serves just the first 100 coverages in a big collection, relying on a client that
@@ -113,14 +116,16 @@ use case of downloading data dumps may need to be modeled differently.
 Some formats allow that the coverages inside a collection are split off into separate resources
 and referenced from the collection.
 
-If possible, this separation should be exploited, instead of just serving a single file
-with all coverages fully embedded. The advantage is that having separate resources for each
+**Recommendation:** This separation should be exploited, instead of just serving a single file
+with all coverages fully embedded.
+
+The advantage is that having separate resources for each
 coverage allows to link to them, and also allows clients to load only the coverages they
 are interested in (since the collection resource might only include overview data then).
 Note that this does not mean that there can't be a resource which
 offers the collection with full coverage data embedded (more on that in later sections).
 
-Example serving a CoverageJSON collection as separate resources:
+#### Example serving a CoverageJSON collection as separate resources
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -172,14 +177,18 @@ Link: <http://example.com/coveragecollection>; rel="collection"
 }
 ```
 
-It is recommended to include the above `Link` header in coverage resources of
+**Recommendation:** The above `Link` header with `rel="collection"` should be included in coverage resources of
 the collection to provide context and a way of navigation independent of what might be
 stored inside the coverage format itself (see `"inCollection"`).
 
+**Requirement:** If the coverage format does not support including a reference to the collection
+resource, then the above `Link` header with `rel="collection"` must be included.
+
 Whether to include the full coverage data in a collection resource or just
 provide links to it must be decided case-by-case.
-It is advisable that the data volume is kept to an amount that web clients
-can still handle easily, which typically means up to a few megabytes at most.
+
+**Recommendation:** The data volume of a resource should be kept to an amount that web clients
+can still handle easily, which typically means up to a few megabytes (after gzip) at most.
 
 ## 5. Paged collection resources
 
