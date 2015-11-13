@@ -62,7 +62,7 @@ Content-Type: image/tiff
 
 ## 3. Content negotiation
 
-**Recommendation:* If the same Coverage Data should be made available in different formats,
+**Recommendation:** If the same Coverage Data should be made available in different formats,
 then [content negotiation](https://en.wikipedia.org/wiki/Content_negotiation) should be used.
 
 Content negotiation requires more support on the server side but makes sure that the
@@ -113,11 +113,15 @@ use case of downloading data dumps may need to be modeled differently.
 
 ## 4. Collection elements as separate resources
 
-Some formats allow that the coverages inside a collection are split off into separate resources
-and referenced from the collection.
+Some coverage data formats allow to group coverages in collections,
+for example the netCDF-CF and the CoverageJSON formats, but not the GeoTIFF format.
+Of those formats, some allow to split off the individual coverages as separate resources
+and reference them from the collection, possibly including some limited metadata about
+each referenced coverage within the collection itself.
 
-**Recommendation:** This separation should be exploited, instead of just serving a single file
-with all coverages fully embedded.
+**Recommendation:** If the coverage data format supports collections and allows to split off
+individual coverages into separate resources, then this separation should be exploited,
+instead of just serving a single file with all coverages fully embedded.
 
 The advantage is that having separate resources for each
 coverage allows to link to them, and also allows clients to load only the coverages they
@@ -181,7 +185,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
 the collection to provide context and a way of navigation independent of what might be
 stored inside the coverage format itself (see `"inCollection"`).
 
-**Requirement:** If the coverage format does not support including a reference to the collection
+**Requirement:** If the coverage format does not support including a reference back to the collection
 resource, then the above `Link` header with `rel="collection"` must be included.
 
 Whether to include the full coverage data in a collection resource or just
@@ -190,13 +194,36 @@ provide links to it must be decided case-by-case.
 **Recommendation:** The data volume of a resource should be kept to an amount that web clients
 can still handle easily, which typically means up to a few megabytes (after gzip) at most.
 
+### 4.1. Alternatives for unsuitable formats
+
+If a coverage data format does not support collections or to split off coverages from a
+collection, then the recommendations of this section can still be implemented by using a mix of formats. 
+The only requirement is that the coverage data format must allow it to represent a single coverage
+in a single resource. That is, it must not be a collection-only format.
+
+**Recommendation:** If collections with split off coverages are not supported by the coverage data
+format, then a different format should be used for collection resources.
+
+For example, a set of GeoTIFF resources that are exposed as individual resources can be
+grouped together with a collection resource in a different format.
+The collection format could be using JSON-LD with the lightweight Hydra collection vocabulary.
+An alternative to JSON-LD may be ATOM feeds. Selecting a suitable collection format depends on many factors,
+some of which are:
+- degree of support in clients and servers (e.g. XML vs JSON)
+- customizability, e.g. ability to include coverage-related metadata in an interoperable way
+- effort to add advanced functionality like paging or filtering (including self-describing API control data)
+
+**Recommendation:** JSON-LD should be used as an alternative collection format.
+
 ## 5. Paged collection resources
 
 Coverage data can become big quite quickly.
 Therefore, different strategies are needed for clients to handle such data in a
 convenient way. One such strategy is to offer paged collection resources.
 
-Example serving a paged CoverageJSON collection:
+**Recommendation:** If the coverage data format supports to split a it in a natural way, coverage collections
+
+#### Example serving a paged CoverageJSON collection
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
