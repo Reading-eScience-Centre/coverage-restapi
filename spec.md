@@ -445,14 +445,11 @@ NOTE: "multipleValues" is [not standardized in Hydra](https://lists.w3.org/Archi
 
 ## 7. Spatiotemporally filtered collection resources
 
-TODO the filtered collection should probably be its own resource and link to its parent collection
-     via some predicate like subsetOf, canonical etc.
-
 A common use case is to filter big coverage collections by a certain geographical area or
 time period.
 
 
-Example:
+#### Example
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -515,9 +512,26 @@ $ curl http://example.com/coveragecollection?bbox=120,10,134,14&timeStart=2012-0
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://example.com/coveragecollection>; rel="canonical"
 
-{... only includes coverages that match the filter criteria ...}
+{
+  "@context": [
+    "http://www.w3.org/ns/hydra/core",
+    "http://coveragejson.org",
+    {
+      "api": "http://coverageapi.org/ns#api",
+      "filteredFrom": "http://coverageapi.org/ns#filteredFrom",
+      "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
+      "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
+    }
+  ],
+  "id": "http://example.com/coveragecollection?bbox=120,10,134,14&timeStart=2012-01-01T00:00:00Z&timeEnd=2012-02-01T00:00:00Z",
+  "type": "CoverageCollection",
+  "coverages": [...those that match the filter...],
+  "filteredFrom": {
+    "id": "http://example.com/coveragecollection",
+    "api": {...as above...}
+  }
+}
 ```
 
 The exact semantics of the parameters together with additional parameters are defined in
@@ -527,7 +541,7 @@ Note that if more filtering options are required than are defined within OpenSea
 (for example, depth/vertical filtering), then a new template variable from another such standard
 may be used, or a new custom created if none exists, under a different URI namespace.
 
-Example of non-standard filtering parameter:
+#### Example of non-standard filtering parameters
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -582,7 +596,7 @@ Note that equally to the previous section this specification does *not* force a 
 ## 7. Spatiotemporally subsetted resources
 
 
-Example of subsetting a single coverage:
+#### Example of subsetting a single coverage
 ```sh
 $ curl http://example.com/coveragecollection/coverage1 -H "Accept: application/prs.coverage+json"
 
@@ -599,7 +613,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
       "api": "covapi:api",
       "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
       "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/",
-      "inCollection": { "@reverse": "member" }
+      "inCollection": { "@reverse": "hydra:member" }
     }
   ],
   "id": "http://example.com/coveragecollection/coverage1",
@@ -664,7 +678,7 @@ Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTime
       "covapi": "http://coverageapi.org/ns#",
       "api": "covapi:api",
       "subsetOf": "covapi:subsetOf",
-      "inCollection": { "@reverse": "member" },
+      "inCollection": { "@reverse": "hydra:member" },
       "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
       "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
     }
