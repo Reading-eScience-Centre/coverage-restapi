@@ -94,22 +94,21 @@ specifically request that format.
 
 **Pro Tip:** Offer HTML as format as well so that *humans* can explore the coverage data as well.
 
-### A note on copy-pasting URLs and expectations
+### A note on copy-pasting URLs
 
 A slight inconvenience with this approach is that it doesn't easily allow
-a human to copy-paste URLs into a browser address bar and "download" the data,
+a human to copy-paste URLs into a browser address bar and "download" the data in a given format,
 since he cannot select the format directly.
 A common way out is to also make the different formats available under URLs with file extensions
 (see the "[Static resources](#2-static-resources)" section),
 which then would always deliver the corresponding format and side-step content negotiation.
+This approach is also common with HTML pages when doing content negotiation based on languages
+using the `Accept-Language` header. The initial page would typically redirect to a page that
+has the language encoded within the URL, making it possible to link to that specific language
+version. As long as humans and machines are aware of the distinction between the canonical
+resource and a specialized version of it there should be no harm in following such patterns.
 
-However, this case gets more complex once the API grows and, for example,
-serves just the first 100 coverages in a big collection, relying on a client that
-understands how to "page" through the collection.
-Then the expectation of simply "downloading" all the data in the correct format
-by appending a file extension might lead to confusing results ("Where's the rest?").
-In that sense, file extensions are likely not always the answer, and the specific
-use case of downloading data dumps may need to be modeled differently.
+TODO possibly make this more concrete, suggest rel=canonical Links
 
 ## 4. Collection elements as separate resources
 
@@ -323,7 +322,7 @@ resource that includes all necessary data.
 A server may offer support for such client preferences but it does not have to.
 The recommended way to offer such functionality is described below.
 
-Example:
+#### Example of asking a server to preferably embed certain data 
 ```sh
 $ curl http://example.com/coveragecollection
 
@@ -445,6 +444,9 @@ This is the only trigger for clients to know what the parameter means and how to
 NOTE: "multipleValues" is [not standardized in Hydra](https://lists.w3.org/Archives/Public/public-hydra/2015Nov/0082.html) yet.
 
 ## 7. Spatiotemporally filtered collection resources
+
+TODO the filtered collection should probably be its own resource and link to its parent collection
+     via some predicate like subsetOf, canonical etc.
 
 A common use case is to filter big coverage collections by a certain geographical area or
 time period.
