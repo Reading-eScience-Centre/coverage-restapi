@@ -221,7 +221,8 @@ Coverage data can become big quite quickly.
 Therefore, different strategies are needed for clients to handle such data in a
 convenient way. One such strategy is to offer paged collection resources.
 
-**Recommendation:** If the coverage data format supports to split a it in a natural way, coverage collections
+**Recommendation:** If the coverage collection format supports or allows to integrate paging in a natural way,
+then paged collection resources should be offered for collections with big numbers of coverages.
 
 #### Example serving a paged CoverageJSON collection
 ```sh
@@ -277,27 +278,32 @@ Link: <http://example.com/coveragecollection?page=221>; rel="last"
 {...}
 ```
 
-There are several things to consider here:
-- If there would be just a single page, then none of the above would happen.
-  There would be no redirect to page one and there would be no navigational metadata.
-  Paging only comes into effect when there is more than one page.
-- Navigational metadata has to be included in the response of each page.
-  If the format itself allows to include those (as above inside the `"view"` property)
-  in an interoperable way then this should be done.
-  In addition, matching Link headers may be included as well.
-  However, if the format does not allow to include navigational metadata, then
-  the Link headers are required.
-- A server is not required to support all navigation patterns. This means that
-  "first" and "last" are optional. A server can also just support forward traversal.
-- If JSON-LD is used as a format, then the navigational metadata should be included
-  as above using the Hydra ontology in a non-default graph. The default graph should
-  not be used to logically separate the actual data from the control metadata.
-- If the format supports resource identifiers (as above), then the collection elements
-  have to be associated to the collection resource and *not* the page resource.
-  Only the navigational metadata may be associated with the page resource.
-  If the format does not support resource identifiers, then a Link header with "canonical"
-  is required that links back to the collection resource, otherwise it is optional but
-  recommended.
+**Requirement:** A collection itself and a page of it must be separate resources,
+including the first page.
+
+**Requirement:** Each page resource must include links to navigate the paged collection,
+at a minimum a link to the next page, if it is not the last.
+If the format does not allow to include such links, then Link headers as shown above
+with `rel="first"`, `rel="prev"`, `rel="next"`, `rel="last"` must be used.
+
+**Requirement:** If the format supports resource identifiers (as above), then the collection elements
+have to be associated to the collection resource and *not* the page resource.
+Only the navigation links may be associated with the page resource.
+If the format does not support resource identifiers, then a Link header with `ref="canonical"`
+is required that links back to the collection resource.
+
+**Recommendation:** If a collection offers pages, then the collection resource should
+redirect to the first page with a "303 See Other" HTTP status.
+
+**Recommendation:** If a collection would only contain a single page, then paged
+collection resources should not be offered at all.
+
+**Recommendation:** The `Link` headers (incl. "canonical") should be included in page resources to provide
+context and a way of navigation independent of what the format includes.
+
+**Recommendation:** If JSON-LD is used as a format, then the navigation controls should be included
+as above using the Hydra ontology in a non-default graph. The default graph should
+not be used to logically separate the actual data from the control data.
 
 ## 6. Embedded resources
 
