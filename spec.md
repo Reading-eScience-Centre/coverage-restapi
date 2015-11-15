@@ -353,7 +353,7 @@ the [`include`](http://www.w3.org/TR/ldp/#prefer-parameters) parameter of the `r
 defined in [LDP](http://www.w3.org/TR/ldp/) should be used for that purpose.
 
 A standard way to advertise available `include` URIs to the client does not exist yet.
-In the example above, a custom predicate `http://coverageapi.org/ns#canInclude` in a Link header is used for that purpose.
+In the example above, a custom predicate `http://coverageapi.org/ns#canInclude` in a `Link` header is used for that purpose.
 
 **Recommendation:** If a resource supports optional embedding via the `Prefer` header, then
 the available `include` URIs should be included in `Link` headers with `rel="http://coverageapi.org/ns#canInclude"`.
@@ -372,7 +372,7 @@ Note that the above method requires a server implementation of
 
 **Recommendation:** Browser clients that access cross-domain coverage data should only send a `Prefer` header
 after they have confirmed that the server understands it. The client should assume that this is the case
-if a Link header with `rel="http://coverageapi.org/ns#canInclude"` is included or the `Vary` header
+if a `Link` header with `rel="http://coverageapi.org/ns#canInclude"` is included or the `Vary` header
 includes `Prefer`. Furthermore, the client should assume that any related coverage data resource on the same
 domain has the same support. The reason for confirming support before-hand is that not all servers
 implement CORS "preflight" requests which would mean that in those cases the request would simply fail, but in
@@ -441,7 +441,7 @@ Link: <http://example.com/coveragecollection>; rel="canonical"
 ```
 
 **Requirement:** If a server decides to reject a request for embedding data based on URL templates,
-then it must redirect to a resource that the server can fulfill with a "303 See Other" HTTP status.
+then it must redirect with a "303 See Other" HTTP status to a resource whose preferences the server can fulfill.
 
 #### Example of rejecting a request for including data
 ```sh
@@ -459,7 +459,7 @@ in the coverage data format in an interoperable way.
 **Requirement:** If the format supports resource identifiers (as above), then the collection elements
 have to be associated to the collection resource and *not* the resource that corresponds to the URL
 template for embedding data.
-If the format does not support resource identifiers, then a Link header with `ref="canonical"`
+If the format does not support resource identifiers, then a Link header with `rel="canonical"`
 is required that links back to the collection resource.
 
 **Recommendation:** If JSON-LD is used as a format, then the URL template for requesting to
@@ -470,18 +470,18 @@ not be used to logically separate the actual data from the control data.
 that correspond to the URL template for embedding data to provide context independent of what the format includes.
 
 Note that this specification does *not* force a specific URL template. The important detail
-is only the `"property"` within the template mapping, which is `http://coverageapi.org/ns#preferInclude`.
-This is the only trigger for clients to know what the parameter means and how to use it. 
+is only the `"property"` within the template mapping, which is `http://coverageapi.org/ns#preferInclude`
+and which should be used in non-JSON-LD scenarios as well if possible.
+The property should be the only trigger for clients to know what the parameter means and how to use it. 
 
 NOTE: "multipleValues" is [not standardized in Hydra](https://lists.w3.org/Archives/Public/public-hydra/2015Nov/0082.html) yet.
 
 ## 7. Spatiotemporally filtered collection resources
 
 A common use case is to filter big coverage collections by a certain geographical area or
-time period.
+time period. The recommended way to offer such functionality is described below.
 
-
-#### Example
+#### Example of spatiotemporally filtering a collection
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -566,14 +566,58 @@ Content-Type: application/prs.coverage+json
 }
 ```
 
-The exact semantics of the parameters together with additional parameters are defined in
-[OpenSearch Geo & Time](http://www.opengis.net/doc/IS/opensearchgeo/1.0).
+The example reuses URL parameters that are defined in the [OpenSearch Geo & Time standard](http://www.opengis.net/doc/IS/opensearchgeo/1.0).
+This standard describes the exact semantics of the parameters together with additional parameters that can be used, for example,
+`opensearchgeo:relation` which may be one of "intersects", "contains", or "disjoint" with the default being "intersects".
+
+**Requirement:** If a server cannot fulfill the requested subsetting operation for some reason, e.g. trying
+to subset to an interval that is fully outside the coverage boundaries, an error response with a suitable
+HTTP status code like `400 Bad Request` must be returned.
+
+**Recommendation:** An error response should include details on the error and be in a format
+that the client can easily understand. In particular "[Problem Details for HTTP APIs](https://github.com/dret/I-D/tree/master/http-problem-rdf)"
+should be returned for non-HTML requests instead of inventing a custom error format.
+
+#### Example of requesting a resource with invalid subsetting parameters
+```sh
+$ curl http://example.com/coveragecollection?timeStart=yesterday&timeEnd=today \
+  -H "Accept: application/prs.coverage+json"
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/ld+json
+
+{
+  "@context": "https://raw.githubusercontent.com/dret/I-D/master/http-problem-rdf/http-problem-context.jsonld",
+  "type": "http://example.com/problems#InvalidSyntax",
+  "title": "Invalid query parameter syntax.",
+  "detail": "Invalid syntax for timeStart and timeEnd query parameters, must be in RFC3339 format."
+}
+```
+
+**Requirement:** If embedding data is supported via URL templates then those templates must be included
+in the coverage data format in an interoperable way.
+
+**Requirement:** If the format supports resource identifiers (as above), then the collection elements
+have to be associated to the collection resource and *not* the resource that corresponds to the URL
+template for embedding data.
+If the format does not support resource identifiers, then a Link header with `rel="canonical"`
+is required that links back to the collection resource.
+
+**Recommendation:** If JSON-LD is used as a format, then the URL template for requesting to
+embed data should be included as above using the Hydra ontology in a non-default graph. The default graph should
+not be used to logically separate the actual data from the control data.
+
+**Recommendation:** The `Link` header with `rel="canonical"` should be included in resources
+that correspond to the URL template for embedding data to provide context independent of what the format includes.
+
+
+
 
 Note that if more filtering options are required than are defined within OpenSearch Geo & Time
 (for example, depth/vertical filtering), then a new template variable from another such standard
-may be used, or a new custom created if none exists, under a different URI namespace.
+may be used, or a new custom one created if none exists, under a different URI namespace.
 
-#### Example of non-standard filtering parameters
+#### Example of non-standard spatial filtering parameters
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -620,8 +664,8 @@ Content-Type: application/prs.coverage+json
 }
 ```
 In this example, the coordinate reference system for the vertical coordinates would have to be
-defined in the same collection document such that the client knows what the parameters verticalStart
-and verticalEnd really mean.
+defined in the same collection document such that the client knows what the parameters `verticalStart`
+and `verticalEnd` really mean in that context.
 
 Note that equally to the previous section this specification does *not* force a specific URL template.
 
