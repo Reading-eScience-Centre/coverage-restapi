@@ -40,7 +40,7 @@ which may be static files served by a simple server.
 
 **Requirement:** The correct media type must be returned for the formats that are offered.
 
-#### Example serving a netCDF file
+**Example serving a netCDF file:**
 ```sh
 $ curl http://example.com/coveragedata.nc
 
@@ -50,7 +50,7 @@ Content-Type: application/x-netcdf
 [binary netcdf]
 ```
 
-#### Example serving a GeoTIFF file
+**Example serving a GeoTIFF file:**
 ```sh
 $ curl http://example.com/coveragedata.geotiff
 
@@ -69,7 +69,7 @@ Content negotiation requires more support on the server side but makes sure that
 Coverage Data as a concept stays at a *single* URL (which is important
 in the linked web).
 
-#### Example using content negotiation
+**Example using content negotiation:**
 ```sh
 $ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
 
@@ -128,7 +128,7 @@ are interested in (since the collection resource might only include overview dat
 Note that this does not mean that there can't be a resource which
 offers the collection with full coverage data embedded (more on that in later sections).
 
-#### Example serving a CoverageJSON collection as separate resources
+**Example serving a CoverageJSON collection as separate resources:**
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -223,7 +223,7 @@ convenient way. One such strategy is to offer paged collection resources.
 **Recommendation:** If the coverage collection format supports or allows to integrate paging in a natural way,
 then paged collection resources should be offered for collections with big numbers of coverages.
 
-#### Example serving a paged CoverageJSON collection
+**Example serving a paged CoverageJSON collection:**
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -320,9 +320,16 @@ followed by fetching hundreds of small coverage resources, one could fetch a sin
 resource that includes all necessary data.
 
 A server may offer support for such client preferences but it does not have to.
-The recommended way to offer such functionality is described below.
+The recommended way to offer such functionality is described in the following subsection.
 
-#### Example of asking a server to preferably embed certain data
+### 6.1. `Prefer` header method for embedding data
+
+**Recommendation:** If a resource should support the optional embedding of certain data, then
+the `Prefer` header defined in [RFC7240](https://tools.ietf.org/html/rfc7240) and
+the [`include`](http://www.w3.org/TR/ldp/#prefer-parameters) parameter of the `return` preference
+defined in [LDP](http://www.w3.org/TR/ldp/) should be used for that purpose.
+
+**Example of asking a server to preferably embed certain data:**
 ```sh
 $ curl http://example.com/coveragecollection
 
@@ -346,11 +353,6 @@ Vary: Prefer
 
 {... domain and range are embedded now ...}
 ```
-
-**Recommendation:** If a resource should support the optional embedding of certain data, then
-the `Prefer` header defined in [RFC7240](https://tools.ietf.org/html/rfc7240) and
-the [`include`](http://www.w3.org/TR/ldp/#prefer-parameters) parameter of the `return` preference
-defined in [LDP](http://www.w3.org/TR/ldp/) should be used for that purpose.
 
 A standard way to advertise available `include` URIs to the client does not exist yet.
 In the example above, a custom predicate `http://coverageapi.org/ns#canInclude` in a `Link` header is used for that purpose.
@@ -379,9 +381,12 @@ implement CORS "preflight" requests which would mean that in those cases the req
 fact would succeed if the `Prefer` header had not been included.
 
 If the above method using the `Prefer` header is not suitable for a specific API implementation,
-then an alternative based on URL templates ([RFC6570](https://tools.ietf.org/html/rfc6570)) may be used.
+then an alternative based on URL templates ([RFC6570](https://tools.ietf.org/html/rfc6570)) may be used
+as described in the following.
 
-#### Example of asking a server to embed certain data with URL templates 
+### 6.2. URL template method for embedding data
+
+**Example of asking a server to embed certain data with URL templates:** 
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -443,7 +448,7 @@ Link: <http://example.com/coveragecollection>; rel="canonical"
 **Requirement:** If a server decides to reject a request for embedding data based on URL templates,
 then it must redirect with a "303 See Other" HTTP status to a resource whose preferences the server can fulfill.
 
-#### Example of rejecting a request for including data
+**Example of rejecting a request for including data:**
 ```sh
 $ curl http://example.com/coveragecollection?include=domain&include=range \
   -H "Accept: application/prs.coverage+json"
@@ -481,7 +486,7 @@ NOTE: "multipleValues" is [not standardized in Hydra](https://lists.w3.org/Archi
 A common use case is to filter big coverage collections by a certain geographical area or
 time period. The recommended way to offer such functionality is described below.
 
-#### Example of spatiotemporally filtering a collection
+**Example of spatiotemporally filtering a collection:**
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -520,7 +525,7 @@ Content-Type: application/prs.coverage+json
         "variable": "timeStart",
         "property": {
           "id": "opensearchtime:start",
-          "comment": "Character string with the start of the temporal interval according to RFC3339.",
+          "comment": "Character string with the start of the temporal interval according to an RFC3339 date-time.",
           "range": "xsd:string"
         },
         "required": false
@@ -529,7 +534,7 @@ Content-Type: application/prs.coverage+json
         "variable": "timeEnd",
         "property": {
           "id": "opensearchtime:end",
-          "comment": "Character string with the end of the temporal interval according to RFC3339.",
+          "comment": "Character string with the end of the temporal interval according to an RFC3339 date-time.",
           "range": "xsd:string"
         },
         "required": false
@@ -567,18 +572,31 @@ Content-Type: application/prs.coverage+json
 ```
 
 The example reuses URL parameters that are defined in the [OpenSearch Geo & Time standard](http://www.opengis.net/doc/IS/opensearchgeo/1.0).
-This standard describes the exact semantics of the parameters together with additional parameters that can be used, for example,
+This standard describes the exact syntax and semantics of the parameters together with additional parameters that can be used, for example,
 `opensearchgeo:relation` which may be one of "intersects", "contains", or "disjoint" with the default being "intersects".
 
-**Requirement:** If a server cannot fulfill the requested subsetting operation for some reason, e.g. trying
-to subset to an interval that is fully outside the coverage boundaries, an error response with a suitable
+**Requirement:** If a collection resource supports spatiotemporal filtering, then the corresponding URL templates
+must be included in the coverage data format in an interoperable way.
+
+**Recommendation:** If the format supports resource identifiers (as above), then the collection elements
+should be associated to the filtered collection resource and not the unfiltered collection resource.
+That way it is straight-forward to add paging functionality and a `"totalItems"` count to the filtered
+collection.
+A link to the unfiltered collection resource should be included within the filtered collection.
+
+**Recommendation:** If JSON-LD is used as a format, then the URL template for filtering the collection
+should be included as above using the Hydra ontology in a non-default graph. The default graph should
+not be used to logically separate the actual data from the control data.
+
+**Requirement:** If a server cannot fulfill the requested filtering operation for some reason, e.g. because
+the client used a wrong parameter syntax, then an error response with a suitable
 HTTP status code like `400 Bad Request` must be returned.
 
 **Recommendation:** An error response should include details on the error and be in a format
 that the client can easily understand. In particular "[Problem Details for HTTP APIs](https://github.com/dret/I-D/tree/master/http-problem-rdf)"
 should be returned for non-HTML requests instead of inventing a custom error format.
 
-#### Example of requesting a resource with invalid subsetting parameters
+**Example of requesting a resource with invalid filter parameters:**
 ```sh
 $ curl http://example.com/coveragecollection?timeStart=yesterday&timeEnd=today \
   -H "Accept: application/prs.coverage+json"
@@ -590,89 +608,20 @@ Content-Type: application/ld+json
   "@context": "https://raw.githubusercontent.com/dret/I-D/master/http-problem-rdf/http-problem-context.jsonld",
   "type": "http://example.com/problems#InvalidSyntax",
   "title": "Invalid query parameter syntax.",
-  "detail": "Invalid syntax for timeStart and timeEnd query parameters, must be in RFC3339 format."
+  "detail": "Invalid syntax for timeStart and timeEnd query parameters, must be in RFC3339 date-time format."
 }
 ```
 
-**Requirement:** If embedding data is supported via URL templates then those templates must be included
-in the coverage data format in an interoperable way.
-
-**Requirement:** If the format supports resource identifiers (as above), then the collection elements
-have to be associated to the collection resource and *not* the resource that corresponds to the URL
-template for embedding data.
-If the format does not support resource identifiers, then a Link header with `rel="canonical"`
-is required that links back to the collection resource.
-
-**Recommendation:** If JSON-LD is used as a format, then the URL template for requesting to
-embed data should be included as above using the Hydra ontology in a non-default graph. The default graph should
-not be used to logically separate the actual data from the control data.
-
-**Recommendation:** The `Link` header with `rel="canonical"` should be included in resources
-that correspond to the URL template for embedding data to provide context independent of what the format includes.
-
-
-
-
-Note that if more filtering options are required than are defined within OpenSearch Geo & Time
+Note that if more filtering parameters are required than are defined within OpenSearch Geo & Time
 (for example, depth/vertical filtering), then a new template variable from another such standard
 may be used, or a new custom one created if none exists, under a different URI namespace.
-
-#### Example of non-standard spatial filtering parameters
-```sh
-$ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
-
-HTTP/1.1 200 OK
-Content-Type: application/prs.coverage+json
-
-{
-  "@context": [
-    "http://www.w3.org/ns/hydra/core",
-    "http://coveragejson.org",
-    {
-      "api": "http://coverageapi.org/ns#api"
-    }
-  ],
-  "id": "http://example.com/coveragecollection",
-  "type": "CoverageCollection",
-  "coverages": [...],
-  "api": {
-    "id" : "#api",
-    "@graph" : {
-      "type": "IriTemplate",
-      "template": "http://example.com/coveragecollection{?verticalStart,verticalEnd}",
-      "mapping": [{
-        "type": "IriTemplateMapping",
-        "variable": "verticalStart",
-        "property": {
-          "id": "http://some.namespace/ns#verticalStart",
-          "comment": "Numeric string with the start of the vertical interval given in native CRS units.",
-          "range": "xsd:string"
-        },
-        "required": false
-      }, {
-        "type": "IriTemplateMapping",
-        "variable": "verticalEnd",
-        "property": {
-          "id": "http://some.namespace/ns#verticalEnd",
-          "comment": "Numeric string with the end of the vertical interval given in native CRS units.",
-          "range": "xsd:string"
-        },
-        "required": false
-      }]
-    }
-  }
-}
-```
-In this example, the coordinate reference system for the vertical coordinates would have to be
-defined in the same collection document such that the client knows what the parameters `verticalStart`
-and `verticalEnd` really mean in that context.
 
 Note that equally to the previous section this specification does *not* force a specific URL template.
 
 ## 7. Spatiotemporally subsetted resources
 
 
-#### Example of subsetting a single coverage
+**Example of subsetting a single coverage:**
 ```sh
 $ curl http://example.com/coveragecollection/coverage1 -H "Accept: application/prs.coverage+json"
 
@@ -804,7 +753,7 @@ When a domain axis shall be fixed to a single coordinate (e.g. a given time or h
 then it may be easier to operate in the index space of the coverage domain.
 This is typically only possible if the corresponding coverage domain is already known.
 
-Example of subsetting a single coverage:
+**Example of subsetting a single coverage:**
 ```sh
 $ curl http://example.com/coveragecollection/coverage1 -H "Accept: application/prs.coverage+json"
 
