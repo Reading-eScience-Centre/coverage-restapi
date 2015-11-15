@@ -322,7 +322,7 @@ resource that includes all necessary data.
 A server may offer support for such client preferences but it does not have to.
 The recommended way to offer such functionality is described below.
 
-#### Example of asking a server to preferably embed certain data 
+#### Example of asking a server to preferably embed certain data
 ```sh
 $ curl http://example.com/coveragecollection
 
@@ -346,24 +346,42 @@ Vary: Prefer
 
 {... domain and range are embedded now ...}
 ```
-This is based on the `Prefer` header defined in [RFC7240](https://tools.ietf.org/html/rfc7240) and
+
+**Recommendation:** If a resource should support the optional embedding of certain data, then
+the `Prefer` header defined in [RFC7240](https://tools.ietf.org/html/rfc7240) and
 the [`include`](http://www.w3.org/TR/ldp/#prefer-parameters) parameter of the `return` preference
-defined within [LDP](http://www.w3.org/TR/ldp/).
+defined in [LDP](http://www.w3.org/TR/ldp/) should be used for that purpose.
+
 A standard way to advertise available `include` URIs to the client does not exist yet.
 In the example above, a custom predicate `http://coverageapi.org/ns#canInclude` in a Link header is used for that purpose.
-The `Prefer` header is not more than a preference. A server may not respect that preference and the client is expected
-to handle the situation regardless. However, if the server sends Link headers as above, then it should also support those
-preferences. The client can inspect whether the server fulfilled the preference by looking
-at the returned coverage data.
+
+**Recommendation:** If a resource supports optional embedding via the `Prefer` header, then
+the available `include` URIs should be included in `Link` headers with `rel="http://coverageapi.org/ns#canInclude"`.
+
+**Requirement:** The `Prefer` header must not be more than a preference.
+A server may not respect that preference and the client is expected to handle the situation regardless.
+
+**Recommendation:** If a resource includes `Link` headers with `rel="http://coverageapi.org/ns#canInclude"`,
+then the server should also fulfill those preferences if the client sends them within a request.
+
+The client can inspect whether the server fulfilled a preference by looking at the returned coverage data.
 
 Note that the above method requires a server implementation of 
 [CORS "preflight"](https://en.wikipedia.org/wiki/Cross-origin_resource_sharing#Preflight_example) requests
-which browsers will send when using the `Prefer` header for cross-domain requests.
+(HTTP OPTIONS) which browsers will send when using the `Prefer` header for cross-domain requests.
+
+**Recommendation:** Browser clients that access cross-domain coverage data should only send a `Prefer` header
+after they have confirmed that the server understands it. The client should assume that this is the case
+if a Link header with `rel="http://coverageapi.org/ns#canInclude"` is included or the `Vary` header
+includes `Prefer`. Furthermore, the client should assume that any related coverage data resource on the same
+domain has the same support. The reason for confirming support before-hand is that not all servers
+implement CORS "preflight" requests which would mean that in those cases the request would simply fail, but in
+fact would succeed if the `Prefer` header had not been included.
 
 If the above method using the `Prefer` header is not suitable for a specific API implementation,
-then an alternative based on URL templates ([RFC6570](https://tools.ietf.org/html/rfc6570)) may be used. 
+then an alternative based on URL templates ([RFC6570](https://tools.ietf.org/html/rfc6570)) may be used.
 
-Example:
+#### Example of asking a server to embed certain data with URL templates 
 ```sh
 $ curl http://example.com/coveragecollection -H "Accept: application/prs.coverage+json"
 
@@ -416,12 +434,16 @@ HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
 Link: <http://example.com/coveragecollection>; rel="canonical"
 
-{...}
+{
+  "id": "http://example.com/coveragecollection",
+  ... identical to above but with domains and ranges embedded ...
+}
 ```
 
-If the server decides to reject the request for embedding data, then it must redirect
-to a resource that the server can fulfill, typically the default one without any parameters:
+**Requirement:** If a server decides to reject a request for embedding data based on URL templates,
+then it must redirect to a resource that the server can fulfill with a "303 See Other" HTTP status.
 
+#### Example of rejecting a request for including data
 ```sh
 $ curl http://example.com/coveragecollection?include=domain&include=range \
   -H "Accept: application/prs.coverage+json"
@@ -431,14 +453,24 @@ Location: http://example.com/coveragecollection
 Content-length: 0
 ```
 
-Metadata on how to build the URL for embedding data has to be included in each resource
-that supports it, for example as above inside the `"api"` property.
-If JSON-LD is used as a format, then that metadata should be included
-as above using the Hydra ontology in a non-default graph. The default graph should
-not be used to logically separate the actual data from the control metadata.
+**Requirement:** If embedding data is supported via URL templates then those templates must be included
+in the coverage data format in an interoperable way.
+
+**Requirement:** If the format supports resource identifiers (as above), then the collection elements
+have to be associated to the collection resource and *not* the resource that corresponds to the URL
+template for embedding data.
+If the format does not support resource identifiers, then a Link header with `ref="canonical"`
+is required that links back to the collection resource.
+
+**Recommendation:** If JSON-LD is used as a format, then the URL template for requesting to
+embed data should be included as above using the Hydra ontology in a non-default graph. The default graph should
+not be used to logically separate the actual data from the control data.
+
+**Recommendation:** The `Link` header with `rel="canonical"` should be included in resources
+that correspond to the URL template for embedding data to provide context independent of what the format includes.
 
 Note that this specification does *not* force a specific URL template. The important detail
-is only the "property" within the template mapping, which is `http://coverageapi.org/ns#preferInclude`.
+is only the `"property"` within the template mapping, which is `http://coverageapi.org/ns#preferInclude`.
 This is the only trigger for clients to know what the parameter means and how to use it. 
 
 NOTE: "multipleValues" is [not standardized in Hydra](https://lists.w3.org/Archives/Public/public-hydra/2015Nov/0082.html) yet.
