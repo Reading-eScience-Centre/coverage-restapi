@@ -556,7 +556,7 @@ Content-Type: application/prs.coverage+json
     "http://coveragejson.org",
     {
       "api": "http://coverageapi.org/ns#api",
-      "filteredFrom": "http://coverageapi.org/ns#filteredFrom",
+      "filteredFrom": "http://purl.org/dc/terms/source",
       "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
       "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
     }
@@ -565,6 +565,7 @@ Content-Type: application/prs.coverage+json
   "type": "CoverageCollection",
   "coverages": [...those that match the filter...],
   "filteredFrom": {
+    "type": "CoverageCollection",
     "id": "http://example.com/coveragecollection",
     "api": {...as above...}
   }
@@ -702,7 +703,7 @@ Link: <http://example.com/coveragecollection?subsetBbox=120,10,134,14&subsetTime
     {
       "covapi": "http://coverageapi.org/ns#",
       "api": "covapi:api",
-      "subsetOf": "covapi:subsetOf",
+      "subsetOf": "http://purl.org/dc/terms/source",
       "inCollection": { "@reverse": "hydra:member" },
       "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
       "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
@@ -817,7 +818,7 @@ Content-Type: application/prs.coverage+json
     {
       "covapi": "http://coverageapi.org/ns#",
       "api": "covapi:api",
-      "subsetOf": "covapi:subsetOf",
+      "subsetOf": "http://purl.org/dc/terms/source",
       "inCollection": { "@reverse": "member" },
       "opensearchgeo": "http://a9.com/-/opensearch/extensions/geo/1.0/",
       "opensearchtime": "http://a9.com/-/opensearch/extensions/time/1.0/"
