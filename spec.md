@@ -619,7 +619,7 @@ may be used, or a new custom one created if none exists, under a different URI n
 
 Note that equally to the previous section this specification does *not* force a specific URL template.
 
-## 7. Spatiotemporally subsetted resources
+## 8. Spatiotemporally subsetted resources
 
 
 **Example of subsetting a single coverage:**
@@ -747,7 +747,7 @@ applied to coverage collections, as hinted in the `"inCollection"` field of the 
 
 Note that equally to the previous section this specification does *not* force a specific URL template.
 
-## 8. Index-based subsetted resources
+## 9. Index-based subsetted resources
 
 Subsetting coverage data by defining coordinate bounds (previous section) is not always desirable.
 When a domain axis shall be fixed to a single coordinate (e.g. a given time or height step),
