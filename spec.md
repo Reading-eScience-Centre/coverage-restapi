@@ -87,6 +87,17 @@ Content-Type: image/tiff
 [binary geotiff]
 ```
 
+A common alternative to directly serving data in a specific format is to redirect to a static resource that does not support content negotiation.
+
+**Example using redirects with content negotiation:**
+```sh
+$ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
+
+HTTP/1.1 303 See Other
+Location: http://example.com/coveragedata.nc
+Content-length: 0
+```
+
 The idea is that the client is aware of the formats it supports and therefore
 knows the media types to include in the "Accept" header.
 This is how web browsers work as well, they know HTML, so they
