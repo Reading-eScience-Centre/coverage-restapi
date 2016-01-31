@@ -116,10 +116,7 @@ which then would always deliver the corresponding format and side-step content n
 This approach is also common with HTML pages when doing content negotiation based on languages
 using the `Accept-Language` header. The initial page would typically redirect to a page that
 has the language encoded within the URL, making it possible to link to that specific language
-version. As long as humans and machines are aware of the distinction between the canonical
-resource and a specialized version of it there should be no harm in following such patterns.
-
-TODO possibly make this more concrete, suggest rel=canonical Links
+version.
 
 ## 4. Collection elements as separate resources
 
@@ -247,7 +244,6 @@ $ curl http://example.com/coveragecollection?page=1 -H "Accept: application/prs.
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://example.com/coveragecollection>; rel="canonical"
 Link: <http://example.com/coveragecollection?page=1>; rel="first"
 Link: <http://example.com/coveragecollection?page=2>; rel="next"
 Link: <http://example.com/coveragecollection?page=221>; rel="last"
@@ -279,7 +275,6 @@ $ curl http://example.com/coveragecollection?page=2 -H "Accept: application/prs.
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://example.com/coveragecollection>; rel="canonical"
 Link: <http://example.com/coveragecollection?page=1>; rel="first"
 Link: <http://example.com/coveragecollection?page=1>; rel="prev"
 Link: <http://example.com/coveragecollection?page=3>; rel="next"
@@ -299,8 +294,6 @@ with `rel="first"`, `rel="prev"`, `rel="next"`, `rel="last"` must be used.
 **Requirement:** If the format supports resource identifiers (as above), then the collection elements
 have to be associated to the collection resource and *not* the page resource.
 Only the navigation links may be associated with the page resource.
-If the format does not support resource identifiers, then a Link header with `ref="canonical"`
-is required that links back to the collection resource.
 
 **Recommendation:** If a collection offers pages, then the collection resource should
 redirect to the first page with a "303 See Other" HTTP status.
@@ -308,7 +301,7 @@ redirect to the first page with a "303 See Other" HTTP status.
 **Recommendation:** If a collection would only contain a single page, then paged
 collection resources should not be offered at all.
 
-**Recommendation:** The `Link` headers (incl. "canonical") should be included in page resources to provide
+**Recommendation:** The `Link` headers should be included in page resources to provide
 context and a way of navigation independent of what the format includes.
 
 **Recommendation:** If JSON-LD is used as a format, then the navigation controls should be included
@@ -448,7 +441,6 @@ $ curl http://example.com/coveragecollection?include=domain&include=range \
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.coverage+json
-Link: <http://example.com/coveragecollection>; rel="canonical"
 
 {
   "id": "http://example.com/coveragecollection",
@@ -475,15 +467,10 @@ in the coverage data format in an interoperable way.
 **Requirement:** If the format supports resource identifiers (as above), then the collection elements
 have to be associated to the collection resource and *not* the resource that corresponds to the URL
 template for embedding data.
-If the format does not support resource identifiers, then a Link header with `rel="canonical"`
-is required that links back to the collection resource.
 
 **Recommendation:** If JSON-LD is used as a format, then the URL template for requesting to
 embed data should be included as above using the Hydra ontology in a non-default graph. The default graph should
 not be used to logically separate the actual data from the control data.
-
-**Recommendation:** The `Link` header with `rel="canonical"` should be included in resources
-that correspond to the URL template for embedding data to provide context independent of what the format includes.
 
 Note that this specification does *not* force a specific URL template. The important detail
 is only the `"property"` within the template mapping, which is `http://coverageapi.org/ns#preferInclude`
