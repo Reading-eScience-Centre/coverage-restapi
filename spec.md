@@ -63,18 +63,22 @@ Content-Type: image/tiff
 ## 3. Content negotiation
 
 **Recommendation:** If the same Coverage Data should be made available in different formats,
-then [content negotiation](https://en.wikipedia.org/wiki/Content_negotiation) should be used.
+then [content negotiation](https://en.wikipedia.org/wiki/Content_negotiation) should be used,
+while still offering each format through a unique URL and establishing links between those formats via
+`Link` headers.
 
 Content negotiation requires more support on the server side but makes sure that the
 Coverage Data as a concept stays at a *single* URL (which is important
 in the linked web).
 
-**Example using content negotiation:**
+**Example using content negotiation without redirects:**
 ```sh
 $ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
 
 HTTP/1.1 200 OK
 Content-Type: application/x-netcdf
+Content-Location: http://example.com/coveragedata.nc
+Link: <http://example.com/coveragedata.geotiff>; rel="alternate"; type="image/tiff"
 
 [binary netcdf]
 ```
@@ -83,13 +87,15 @@ $ curl http://example.com/coveragedata -H "Accept: image/tiff"
 
 HTTP/1.1 200 OK
 Content-Type: image/tiff
+Content-Location: http://example.com/coveragedata.geotiff
+Link: <http://example.com/coveragedata.nc>; rel="alternate"; type="application/x-netcdf"
 
 [binary geotiff]
 ```
 
 A common alternative to directly serving data in a specific format is to redirect to a static resource that does not support content negotiation.
 
-**Example using redirects with content negotiation:**
+**Example using content negotiation with redirects:**
 ```sh
 $ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
 
@@ -97,26 +103,23 @@ HTTP/1.1 303 See Other
 Location: http://example.com/coveragedata.nc
 Content-length: 0
 ```
+```sh
+$ curl http://example.com/coveragedata.nc
+
+HTTP/1.1 200 OK
+Content-Type: application/x-netcdf
+Link: <http://example.com/coveragedata.geotiff>; rel="alternate"; type="image/tiff"
+
+[binary netcdf]
+```
 
 The idea is that the client is aware of the formats it supports and therefore
-knows the media types to include in the "Accept" header.
+knows the media types to include in the "Accept" header of the first request.
 This is how web browsers work as well, they know HTML, so they
 specifically request that format.
+In addition, the `Link` header points to URLs of alternative formats. 
 
 **Pro Tip:** Offer HTML as format as well so that *humans* can explore the coverage data as well.
-
-### A note on copy-pasting URLs
-
-A slight inconvenience with this approach is that it doesn't easily allow
-a human to copy-paste URLs into a browser address bar and "download" the data in a given format,
-since he cannot select the format directly.
-A common way out is to also make the different formats available under URLs with file extensions
-(see the "[Static resources](#2-static-resources)" section),
-which then would always deliver the corresponding format and side-step content negotiation.
-This approach is also common with HTML pages when doing content negotiation based on languages
-using the `Accept-Language` header. The initial page would typically redirect to a page that
-has the language encoded within the URL, making it possible to link to that specific language
-version.
 
 ## 4. Collection elements as separate resources
 
