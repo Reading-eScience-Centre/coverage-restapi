@@ -1,5 +1,18 @@
 # Coverage Data REST API Core Specification
 
+This specification is an attempt to define a modern REST API for 
+[coverage data](https://en.wikipedia.org/wiki/Coverage_data).
+
+The API is based on the following main principles:
+- *component-based* - implement only what you or your users need
+- *self-describing* - advertise API functionality as part of each resource
+- *customizable* - no fixed URL structures
+- *extensible* - add your own API features
+- *format-agnostic* - independent of concrete coverage data formats
+
+The status of this document should be considered as work-in-progress
+and may change at any time.
+
 ## 1. Introduction
 
 This API specification is structured in such a way that a server implementation
@@ -15,7 +28,7 @@ as metadata, without relying on a fixed structure like an API root document.
 
 A specific API that is implemented in a server and follows aspects of this specification
 may be loosely named "Coverage Data REST API", however, since such API is merely
-a collection of supported concepts, it is more important to refer and uniquely identify
+a collection of supported concepts, it is more important to refer to and uniquely identify
 those concepts. The reason for that is extensibility and interoperability.
 This specification is meant as a starting place which solves common issues, but a
 natural extension with other external concepts is explicitly allowed and recommended.
