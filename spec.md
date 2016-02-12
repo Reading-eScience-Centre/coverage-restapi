@@ -1,17 +1,24 @@
 # Coverage Data REST API Core Specification
 
-This specification is an attempt to define a modern REST API for 
-[coverage data](https://en.wikipedia.org/wiki/Coverage_data).
+This specification is an attempt to provide the basics for developing a modern and
+interoperable REST API for accessing [coverage data](https://en.wikipedia.org/wiki/Coverage_data)
+such as earth observation imagery. 
+Its focus is not on dataset metadata or cataloguing of such, but techniques
+of accessing coverage data of a dataset once that dataset has been discovered
+by other means.
+It may be considered as a modern alternative to [OGC](http://www.opengeospatial.org/)'s
+[Web Coverage Service](https://en.wikipedia.org/wiki/Web_Coverage_Service),
+however, it is important to understand that this specification is not a single ready-to-use
+API but rather a modular blueprint for developing such interoperable APIs.
 
-The API is based on the following main principles:
-- *component-based* - implement only what you or your users need
-- *self-describing* - advertise API functionality as part of each resource
+This specification is based on the following main principles:
+- *modular* - implement only what you or your users need
+- *self-describing* - advertise API controls as part of each resource
 - *customizable* - no fixed URL structures
 - *extensible* - add your own API features
 - *format-agnostic* - independent of concrete coverage data formats
 
-The status of this document should be considered as work-in-progress
-and may change at any time.
+This document should be considered as work-in-progress and may change at any time.
 
 ## 1. Introduction
 
