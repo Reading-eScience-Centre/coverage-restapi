@@ -88,7 +88,7 @@ while still offering each format through a unique URL and establishing links bet
 `Link` headers.
 
 Content negotiation requires more support on the server side but makes sure that the
-Coverage Data as a concept stays at a *single* URL (which is important
+Coverage Data as a concept stays [at a *single* URL](https://www.w3.org/TR/dwbp/#DataIdentifiers) (which is important
 in the linked web).
 
 **Example using content negotiation without redirects:**
