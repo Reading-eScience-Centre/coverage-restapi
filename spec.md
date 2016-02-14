@@ -98,6 +98,7 @@ $ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
 HTTP/1.1 200 OK
 Content-Type: application/x-netcdf
 Content-Location: http://example.com/coveragedata.nc
+Vary: Accept
 Link: <http://example.com/coveragedata.geotiff>; rel="alternate"; type="image/tiff"
 
 [binary netcdf]
@@ -108,6 +109,7 @@ $ curl http://example.com/coveragedata -H "Accept: image/tiff"
 HTTP/1.1 200 OK
 Content-Type: image/tiff
 Content-Location: http://example.com/coveragedata.geotiff
+Vary: Accept
 Link: <http://example.com/coveragedata.nc>; rel="alternate"; type="application/x-netcdf"
 
 [binary geotiff]
@@ -121,6 +123,7 @@ $ curl http://example.com/coveragedata -H "Accept: application/x-netcdf"
 
 HTTP/1.1 303 See Other
 Location: http://example.com/coveragedata.nc
+Vary: Accept
 Content-length: 0
 ```
 ```sh
