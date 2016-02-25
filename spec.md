@@ -176,13 +176,13 @@ Content-Type: application/prs.coverage+json
   "parameters": {...},
   "coverages": [{
     "id": "http://example.com/coveragecollection/coverage1",
-    "type": "GridCoverage",
+    "type": "Coverage",
     "title": "First coverage",
     "domain": "http://example.com/coverage1_domain",
     "ranges": {"TEMP": "http://example.com/coveragecollection/coverage1/TEMP"} 
   }, {
     "id": "http://example.com/coveragecollection/coverage2",
-    "type": "GridCoverage",
+    "type": "Coverage",
     "title": "Second coverage",
     "domain": "http://example.com/coveragecollection/coverage2/domain",
     "ranges": {"SPEED": "http://example.com/coveragecollection/coverage2/SPEED"}
@@ -202,7 +202,7 @@ Link: <http://example.com/coveragecollection>; rel="collection"
     "http://coveragejson.org",
     { "inCollection": { "@reverse": "member" } }
   ],
-  "type": "GridCoverage",
+  "type": "Coverage",
   "id": "http://example.com/coveragecollection/coverage1",
   "title": "First coverage",
   "domain": {...},
