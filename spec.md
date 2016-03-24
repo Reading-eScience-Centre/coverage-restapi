@@ -158,9 +158,10 @@ instead of just serving a single file with all coverages fully embedded.
 
 The advantage is that having separate resources for each
 coverage allows to link to them, and also allows clients to load only the coverages they
-are interested in (since the collection resource might only include overview data then).
-Note that this does not mean that there can't be a resource which
-offers the collection with full coverage data embedded (more on that in later sections).
+are interested in (since the collection resource might only include overview data by default then).
+Note that this does not mean that there can't be a resource or representation which
+offers the collection with full coverage data embedded (for example, CoverageJSON uses the "profile" media type
+parameter with which an embedded-data version can be explicitly requested).
 
 **Example serving a CoverageJSON collection as separate resources:**
 ```sh
